@@ -8,6 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //Hello pitek
 var app = builder.Build();
+//Testujemy
 
 
 // Configure the HTTP request pipeline.
