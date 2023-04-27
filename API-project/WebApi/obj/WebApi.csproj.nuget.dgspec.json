@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {}
+    "C:\\Users\\XPS\\Source\\Repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {
+    "C:\\Users\\XPS\\Source\\Repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\XPS\\Source\\Repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
         "projectName": "WebApi",
-        "projectPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
-        "packagesPath": "C:\\Users\\jasie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\obj\\",
+        "projectPath": "C:\\Users\\XPS\\Source\\Repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
+        "packagesPath": "C:\\Users\\XPS\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\XPS\\Source\\Repos\\API-project\\API-project\\WebApi\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\jasie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\XPS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -68,7 +73,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files (x86)\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }
