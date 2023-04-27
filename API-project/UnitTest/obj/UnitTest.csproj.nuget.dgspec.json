@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {}
+    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\UnitTest\\UnitTest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj": {
+    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\UnitTest\\UnitTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
-        "projectName": "WebApi",
-        "projectPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\UnitTest\\UnitTest.csproj",
+        "projectName": "UnitTest",
+        "projectPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\UnitTest\\UnitTest.csproj",
         "packagesPath": "C:\\Users\\jasie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\WebApi\\obj\\",
+        "outputPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\UnitTest\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\jasie\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,13 +40,25 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
-            "Microsoft.AspNetCore.OpenApi": {
+            "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[7.0.4, )"
+              "version": "[17.3.2, )"
             },
-            "Swashbuckle.AspNetCore": {
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[6.4.0, )"
+              "version": "[3.1.2, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.4.2, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.4.5, )"
             }
           },
           "imports": [
@@ -61,9 +73,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
