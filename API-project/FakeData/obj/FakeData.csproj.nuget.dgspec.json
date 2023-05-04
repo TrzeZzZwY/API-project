@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\Infrastructure\\Infrastructure.csproj": {}
+    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\FakeData.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\FakeData.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\Infrastructure\\Infrastructure.csproj",
-        "projectName": "Infrastructure",
-        "projectPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\FakeData.csproj",
+        "projectName": "FakeData",
+        "projectPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\FakeData.csproj",
         "packagesPath": "C:\\Users\\jasie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\jasie\\AppData\\Roaming\\NuGet\\NuGet.Config",
