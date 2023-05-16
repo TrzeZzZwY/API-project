@@ -24,8 +24,6 @@ namespace AppCore.Interfaces.Services
         public PublishAlbum Delete(string userLogin, string albumName);
         public PublishAlbum Delete(Guid albumId);
 
-        public PublishAlbum Update(Guid userId, PublishAlbum album);
-        public PublishAlbum Update(string userLogin, PublishAlbum album);
         public PublishAlbum Update(Guid albumId, PublishAlbum album);
     }
 }

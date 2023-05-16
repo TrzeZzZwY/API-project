@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AppCore.Interfaces.Services
 {
-    internal interface IPublishService
+    public interface IPublishService
     {
         public IEnumerable<Publish> GetAll();
         public IEnumerable<Publish> GetAllFor(Guid userId);
