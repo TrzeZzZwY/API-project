@@ -18,15 +18,14 @@ namespace AppCore.Interfaces.Services
         public PublishAlbum GetByOne(string userLogin,string albumName);
 
         public PublishAlbum Create(Guid userId,PublishAlbum album);
+        public PublishAlbum Create(string userLogin, PublishAlbum album);
 
-        public PublishAlbum Delete(Guid UserId,PublishAlbum album);
-        public PublishAlbum Delete(string userLogin, PublishAlbum album);
         public PublishAlbum Delete(Guid userId, string albumName);
         public PublishAlbum Delete(string userLogin, string albumName);
         public PublishAlbum Delete(Guid albumId);
 
-
         public PublishAlbum Update(Guid userId, PublishAlbum album);
         public PublishAlbum Update(string userLogin, PublishAlbum album);
+        public PublishAlbum Update(Guid albumId, PublishAlbum album);
     }
 }
