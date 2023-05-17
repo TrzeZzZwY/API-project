@@ -1,4 +1,5 @@
-﻿using AppCore.Models.Enums;
+﻿using AppCore.Models;
+using AppCore.Models.Enums;
 
 namespace WebApi.Dto.Output
 {
@@ -13,6 +14,16 @@ namespace WebApi.Dto.Output
 
         public string Name { get; set; }
         public Status Status { get; set; }
-        public IEnumerable<PublishOutputDto> Publishes { get; set; }
+        public IEnumerable<PublishOutputDto> Publishes { get; set; } //TODO: dopisać metodę w serwisie
+
+        public static PublishAlbumOutputDto of(PublishAlbum publishAlbum)
+        {
+            if (publishAlbum is null)
+            {
+                throw new ArgumentException();
+            }
+            throw new NotImplementedException();
+            //return new PublishAlbumOutputDto(publishAlbum.Name, publishAlbum.Status);
+        }
     }
 }

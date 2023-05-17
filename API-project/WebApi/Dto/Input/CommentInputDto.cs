@@ -1,4 +1,7 @@
-﻿namespace WebApi.Dto.Input
+﻿using AppCore.Models;
+using WebApi.Dto.Output;
+
+namespace WebApi.Dto.Input
 {
     public class CommentInputDto
     {
@@ -12,9 +15,18 @@
         }
 
         public Guid UserId { get; set; }
-        public Guid TargetUserId { get; set; }
-        public string AlbumName { get; set; }
-        public string PublishName { get; set; }
+        public Guid? TargetUserId { get; set; } // TODO-Jasiek: Tymczasowe rozwiązanie (nie ma TargetUsera w metodzie of)
+        public string AlbumName { get; set; } //TODO: Brak AlbumName w Comment w AppCore
+        public string PublishName { get; set; } //TODO: Brak PublishName w AppCore
         public string CommentContent { get; set; }
+
+        public static CommentInputDto of(Comment comment)
+        {
+            if (comment is null)
+            {
+                throw new ArgumentException();
+            }
+            throw new NotImplementedException();
+        }
     }
 }

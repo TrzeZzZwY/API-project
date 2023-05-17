@@ -1,4 +1,6 @@
-﻿using AppCore.Models.Enums;
+﻿using AppCore.Models;
+using AppCore.Models.Enums;
+using WebApi.Dto.Output;
 
 namespace WebApi.Dto.Input
 {
@@ -12,5 +14,14 @@ namespace WebApi.Dto.Input
 
         public string Name { get; set; }
         public Status Status { get; set; }
+
+        public static PublishAlbumInputDto of(PublishAlbum publishAlbum)
+        {
+            if (publishAlbum is null)
+            {
+                throw new ArgumentException();
+            }
+            return new PublishAlbumInputDto(publishAlbum.Name, publishAlbum.Status);
+        }
     }
 }
