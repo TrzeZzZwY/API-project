@@ -20,6 +20,6 @@ namespace AppCore.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
         public Status Status { get; set; }
-        ISet<Publish> Publishes { get; set; }
+        public ISet<Publish> Publishes { get; set; }
     }
 }

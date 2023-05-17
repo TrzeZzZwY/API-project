@@ -14,14 +14,5 @@ namespace WebApi.Dto.Input
 
         public string Name { get; set; }
         public Status Status { get; set; }
-
-        public static PublishAlbumInputDto of(PublishAlbum publishAlbum)
-        {
-            if (publishAlbum is null)
-            {
-                throw new ArgumentException();
-            }
-            return new PublishAlbumInputDto(publishAlbum.Name, publishAlbum.Status);
-        }
     }
 }

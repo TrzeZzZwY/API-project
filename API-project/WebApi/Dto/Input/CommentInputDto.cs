@@ -19,14 +19,5 @@ namespace WebApi.Dto.Input
         public string AlbumName { get; set; } //TODO: Brak AlbumName w Comment w AppCore
         public string PublishName { get; set; } //TODO: Brak PublishName w AppCore
         public string CommentContent { get; set; }
-
-        public static CommentInputDto of(Comment comment)
-        {
-            if (comment is null)
-            {
-                throw new ArgumentException();
-            }
-            throw new NotImplementedException();
-        }
     }
 }

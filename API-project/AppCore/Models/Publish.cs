@@ -12,7 +12,7 @@ namespace AppCore.Models
     {
         public Publish(string imageName, Cameras? camera,
             string? description,Status? status, ISet<User>? userLikes,
-            ISet<PublishTag> publishTags, ISet<Comment>? comments)
+            ISet<PublishTag>? publishTags, ISet<Comment>? comments)
         {
             ImageName = imageName;
             Camera = camera ?? Cameras.None;
@@ -21,7 +21,7 @@ namespace AppCore.Models
             UploadDate = DateTime.Now;
             Status = status ?? Status.private_publish;
             UserPublishLikes = userLikes ?? new HashSet<User>();
-            PublishTags = publishTags;
+            PublishTags = publishTags ?? new HashSet<PublishTag>();
             Comments = comments ?? new HashSet<Comment>();
         }
 

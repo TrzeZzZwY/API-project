@@ -1,4 +1,5 @@
 ﻿using AppCore.Models;
+using WebApi.Dto.Mappers;
 
 namespace WebApi.Dto.Output
 {
@@ -12,14 +13,5 @@ namespace WebApi.Dto.Output
 
         public string UserLogin { get; set; }
         public string CommentContent { get; set; }
-
-        public static CommentOutputDto of(Comment comment)
-        {
-            if(comment is null)
-            {
-                throw new ArgumentException();
-            }
-            return new CommentOutputDto(comment.User.Login, comment.Content);
-        }
     }
 }
