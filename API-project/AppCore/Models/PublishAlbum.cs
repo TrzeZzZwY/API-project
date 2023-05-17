@@ -1,4 +1,5 @@
 ﻿using AppCore.Interfaces.Identity;
+using AppCore.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace AppCore.Models
     {
         public PublishAlbum(string name, Status? status, ISet<Publish>? publishes)
         {
-            // może dodamy Id = Guid.NewGuid();
             Name = name;
             Status = status ?? Status.private_publish;
             Publishes = publishes ?? new HashSet<Publish>();
