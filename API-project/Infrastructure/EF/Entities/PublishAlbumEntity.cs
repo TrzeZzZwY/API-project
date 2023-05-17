@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AppCore.Models.Enums;
+using AppCore.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF.Entities
 {
-    internal class PublishAlbumEntity
+    public class PublishAlbumEntity
     {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public Status Status { get; set; }
+        ISet<Publish> Publishes { get; set; }
     }
 }
