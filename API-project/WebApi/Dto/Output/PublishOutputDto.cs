@@ -13,7 +13,7 @@ namespace WebApi.Dto.Output
             ImgPath = imgPath;
             UploadDate = uploadDate;
             Status = status;
-            Likes = likes;
+            //Likes = likes;
             Tags = tags;
             Comments = comments;
         }
@@ -21,11 +21,21 @@ namespace WebApi.Dto.Output
         public string ImageName { get; set; }
         public string Camera { get; set; }
         public string Description { get; set; }
-        public string ImgPath { get; set; }
+        public string ImgPath { get; set; } //TODO: Brak ImgPath w AppCore, dopisać metodę w serwisie
         public DateTime UploadDate { get; set; }
         public Status Status { get; set; }
-        public uint Likes { get; set; }
-        public IEnumerable<Tag> Tags { get; set; }
+        // public uint Likes { get; set; } TODO: Metoda w serwisie do obliczania liczby polubień
+        public IEnumerable<Tag> Tags { get; set; } //TODO: Brak listy Tags w AppCore, dopisać metodę w serwisie
         public IEnumerable<Comment> Comments { get; set; }
+
+        public static PublishOutputDto of(Publish publish)
+        {
+            if (publish is null)
+            {
+                throw new ArgumentException();
+            }
+            throw new NotImplementedException();
+            //return new PublishOutputDto(publish.ImageName, publish.Camera, publish.Description, publish.UploadDate, publish.Status, publish.Comments);
+        }
     }
 }
