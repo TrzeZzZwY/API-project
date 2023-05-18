@@ -1,6 +1,7 @@
 ﻿using AppCore.Interfaces.Services;
 using AppCore.Models;
 using Infrastructure.EF.Entities;
+using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Identity;
 using WebApi.Dto.Input;
 using WebApi.Dto.Output;
@@ -10,8 +11,8 @@ namespace WebApi.Dto.Mappers
     public class DtoMapper
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly IPublishService _publishService;
-        public DtoMapper(UserManager<UserEntity> userManager, IPublishService publishService)// TODO: zamisat IPublishService konkretna implementacja !
+        private readonly EfPublishService _publishService;
+        public DtoMapper(UserManager<UserEntity> userManager, EfPublishService publishService)// TODO: zamisat IPublishService konkretna implementacja !
         {
             _userManager = userManager;
             _publishService = publishService;

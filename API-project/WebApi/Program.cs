@@ -1,17 +1,33 @@
+using AppCore.Interfaces.Services;
+using Microsoft.AspNetCore.Identity;
+using Infrastructure.EF;
 using Infrastructure.EF.Entities;
+using Infrastructure.EF.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("ContextConnection") 
+    ?? throw new InvalidOperationException("Connection string not found.");
 
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddIdentity<UserEntity, UserRoleEntity>();
-//TODO rejrestracja servisów
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString)
+    );
+//Identity
+builder.Services.AddIdentity<UserEntity, UserRoleEntity>()
+    .AddEntityFrameworkStores<AppDbContext>();
+
+//Services
+builder.Services.AddScoped<IPublishService, EfPublishService>();
+builder.Services.AddScoped<ICommentService, EfCommentService>();
+builder.Services.AddScoped<IAlbumService, EfAlbumService>();
+
+var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
