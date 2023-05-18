@@ -10,8 +10,9 @@ namespace AppCore.Models
 {
     public class Comment : IIdentity<Guid>
     {
-        public Comment(Guid userId, string content, bool? isEdited, ISet<Comment>? comments)
+        public Comment(Guid userId, string content, bool? isEdited, ISet<Comment>? comments, Guid? id = null)
         {
+            Id = id ?? Guid.Empty;
             UserId = userId;
             Content = content;
             IsEdited = isEdited ?? false;

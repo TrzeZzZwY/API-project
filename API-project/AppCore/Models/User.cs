@@ -11,8 +11,9 @@ namespace AppCore.Models
 {
     public class User : IIdentity<Guid>
     {
-        public User(string login, ISet<Publish>? publishes, ISet<Publish>? userPublishLikes)
+        public User(string login, ISet<Publish>? publishes, ISet<Publish>? userPublishLikes, Guid? id = null)
         {
+            Id = id ?? Guid.Empty;
             Login = login;
             Publishes = publishes ?? new HashSet<Publish>();
             UserPublishLikes = userPublishLikes ?? new HashSet<Publish>();

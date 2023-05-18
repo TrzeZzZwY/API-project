@@ -10,8 +10,9 @@ namespace AppCore.Models
 {
     public class PublishAlbum : IIdentity<Guid>
     {
-        public PublishAlbum(string name, Status? status, ISet<Publish>? publishes)
+        public PublishAlbum(string name, Status? status, ISet<Publish>? publishes, Guid? id = null)
         {
+            Id = id ?? Guid.Empty;
             Name = name;
             Status = status ?? Status.private_publish;
             Publishes = publishes ?? new HashSet<Publish>();

@@ -127,7 +127,8 @@ namespace WebApi.Dto.Mappers
                 status: p.Status,
                 userLikes: null,
                 publishTags: p.Tags,
-                comments: null
+                comments: null,
+                uploadDate: null
                 );
         }
         public IEnumerable<Publish> MapFromInput(IEnumerable<PublishInputDto> p)
