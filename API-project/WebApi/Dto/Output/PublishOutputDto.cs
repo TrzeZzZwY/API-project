@@ -8,7 +8,7 @@ namespace WebApi.Dto.Output
     {
         public PublishOutputDto(string imageName, Cameras? camera, string? description,
             string imgPath, DateTime uploadDate, Status status, uint likes, 
-            IEnumerable<PublishTag>? tags, IEnumerable<Comment>? comments)
+            IEnumerable<PublishTagOutputDto>? tags, IEnumerable<CommentOutputDto>? comments)
         {
             ImageName = imageName;
             Camera = camera?? Cameras.None;
@@ -17,8 +17,8 @@ namespace WebApi.Dto.Output
             UploadDate = uploadDate;
             Status = status;
             Likes = likes;
-            Tags = tags ?? new HashSet<PublishTag>();
-            Comments = comments ?? new HashSet<Comment>();
+            Tags = tags ?? new HashSet<PublishTagOutputDto>();
+            Comments = comments ?? new HashSet<CommentOutputDto>();
         }
 
         public string ImageName { get; set; }
@@ -27,9 +27,9 @@ namespace WebApi.Dto.Output
         public string ImgPath { get; set; } //TODO: Brak ImgPath w AppCore, dopisać metodę w serwisie
         public DateTime UploadDate { get; set; }
         public Status Status { get; set; }
-        public uint Likes { get; set; } //TODO: Metoda w serwisie do obliczania liczby polubień
-        public IEnumerable<PublishTag> Tags { get; set; } //TODO: Brak listy Tags w AppCore, dopisać metodę w serwisie
-        public IEnumerable<Comment> Comments { get; set; }
+        public uint Likes { get; set; }
+        public IEnumerable<PublishTagOutputDto> Tags { get; set; }//TODO: DTO
+        public IEnumerable<CommentOutputDto> Comments { get; set; }
 
     }
 }

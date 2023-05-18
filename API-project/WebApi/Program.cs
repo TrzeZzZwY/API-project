@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddIdentity<UserEntity, UserRoleEntity>();
-
+//TODO rejrestracja servisów
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
