@@ -1,14 +1,14 @@
 ﻿using AppCore.Models;
 using Infrastructure.EF.Entities;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using WebApi.Dto.Input;
 using WebApi.Dto.Output;
 
 namespace WebApi.Dto.Mappers
 {
-    public static class DtoMapper
+    public class DtoMapper
     {
+        private readonly UserManager<UserEntity> userManager;
         public static PublishAlbumOutputDto MapToOutput(PublishAlbum p)
         {
             if(p is null)

@@ -1,5 +1,4 @@
 ﻿using AppCore.Models;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF.Entities
 {
-    public class UserEntity : IdentityUser<Guid>, IUser
+    public class UserEntity : IdentityUser
     {
         public UserEntity(string login, ISet<PublishAlbumEntity>? publishes, ISet<PublishAlbumEntity>? userPublishLikes):base()
         {
@@ -21,7 +20,5 @@ namespace Infrastructure.EF.Entities
         public string Login { get; set; }
         public ISet<PublishAlbumEntity> Publishes { get; set; }
         public ISet<PublishAlbumEntity> UserPublishLikes { get; set; }
-
-        string IUser<string>.Id => throw new NotImplementedException();
     }
 }
