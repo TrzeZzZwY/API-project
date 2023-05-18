@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF
 {
-    public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
+    public class AppDbContext : IdentityDbContext<User, UserRoleEntity, Guid>
     {
     }
 }

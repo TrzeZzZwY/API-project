@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AppCore.Models
 {
-    public class User : IdentityUser<Guid>, IIdentity<Guid>
+    public class User : IIdentity<Guid>
     {
         public User(string login, ISet<Publish>? publishes, ISet<Publish>? userPublishLikes)
         {
@@ -18,6 +18,7 @@ namespace AppCore.Models
             UserPublishLikes = userPublishLikes ?? new HashSet<Publish>();
         }
 
+        public Guid Id { get; set; }
         //mozna dodać znajomch
         //public ISet<User> Friends { get; set; }
         public string Login { get; set; }

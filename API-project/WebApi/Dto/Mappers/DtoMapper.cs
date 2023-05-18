@@ -1,4 +1,7 @@
 ﻿using AppCore.Models;
+using Infrastructure.EF.Entities;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using WebApi.Dto.Input;
 using WebApi.Dto.Output;
 
@@ -55,10 +58,11 @@ namespace WebApi.Dto.Mappers
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
-            return new CommentOutputDto(
-                userLogin: p.User.Login,
-                commentContent: p.Content
-                );
+            /* return new CommentOutputDto(
+                 //userLogin: p.UserId,//TODO
+                 commentContent: p.Content
+                 );*/
+            throw new NotImplementedException();
         }
         public static IEnumerable<CommentOutputDto> MapToOutput(IEnumerable<Comment> p)
         {

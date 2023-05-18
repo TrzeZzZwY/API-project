@@ -10,18 +10,18 @@ namespace AppCore.Models
 {
     public class Comment : IIdentity<Guid>
     {
-        public Comment(User user, string content, bool? isEdited, ISet<Comment>? comments)
+        public Comment(Guid userId, string content, bool? isEdited, ISet<Comment>? comments)
         {
-            User = user;
+            UserId = userId;
             Content = content;
             IsEdited = isEdited ?? false;
             Comments = comments ?? new HashSet<Comment>();
         }
 
         public Guid Id { get; set; }
-        public User User { get; set; }
+        public Guid UserId { get; set; }
         public string Content { get; set; }
         public bool IsEdited { get; set; }
-        ISet<Comment> Comments { get; set; }
+        public ISet<Comment> Comments { get; set; }
     }
 }
