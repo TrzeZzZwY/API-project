@@ -6,23 +6,24 @@ namespace WebApi.Dto.Output
 {
     public class PublishOutputDto
     {
-        public PublishOutputDto(string imageName, Cameras camera, string description,
-            string imgPath, DateTime uploadDate, Status status, uint likes, IEnumerable<PublishTag> tags, IEnumerable<Comment> comments)
+        public PublishOutputDto(string imageName, Cameras? camera, string? description,
+            string imgPath, DateTime uploadDate, Status status, uint likes, 
+            IEnumerable<PublishTag>? tags, IEnumerable<Comment>? comments)
         {
             ImageName = imageName;
-            Camera = camera;
-            Description = description;
+            Camera = camera?? Cameras.None;
+            Description = description ?? String.Empty;
             ImgPath = imgPath;
             UploadDate = uploadDate;
             Status = status;
             Likes = likes;
-            Tags = tags;
-            Comments = comments;
+            Tags = tags ?? new HashSet<PublishTag>();
+            Comments = comments ?? new HashSet<Comment>();
         }
 
         public string ImageName { get; set; }
         public Cameras Camera { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string ImgPath { get; set; } //TODO: Brak ImgPath w AppCore, dopisać metodę w serwisie
         public DateTime UploadDate { get; set; }
         public Status Status { get; set; }
