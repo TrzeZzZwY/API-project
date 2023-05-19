@@ -14,21 +14,6 @@ namespace Infrastructure.EF.Entities
         {
             
         }
-        public PublishEntity(Guid id, string imageName, Cameras camera,
-            string? description, DateTime uploadDate, Status status,
-            ISet<UserEntity> userPublishLikes, ISet<PublishTagEntity>? publishTags,
-            ISet<CommentEntity>? comments)
-        {
-            Id = id;
-            ImageName = imageName;
-            Camera = camera;
-            Description = description;
-            UploadDate = uploadDate;
-            Status = status;
-            UserLikes = userPublishLikes;
-            PublishTags = publishTags ?? new HashSet<PublishTagEntity>();
-            Comments = comments ?? new HashSet<CommentEntity>();
-        }
 
         public Guid Id { get; set; }
         public UserEntity User { get; set; }

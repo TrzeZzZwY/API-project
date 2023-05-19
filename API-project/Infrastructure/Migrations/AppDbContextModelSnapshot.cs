@@ -38,17 +38,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid?>("commentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("publishId")
+                    b.Property<Guid>("publishId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("commentId");
 
                     b.HasIndex("publishId");
 
@@ -368,17 +363,13 @@ namespace Infrastructure.Migrations
                         .WithMany("Comments")
                         .HasForeignKey("UserId");
 
-                    b.HasOne("Infrastructure.EF.Entities.CommentEntity", "comment")
-                        .WithMany("Comments")
-                        .HasForeignKey("commentId");
-
                     b.HasOne("Infrastructure.EF.Entities.PublishEntity", "publish")
                         .WithMany("Comments")
-                        .HasForeignKey("publishId");
+                        .HasForeignKey("publishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
-
-                    b.Navigation("comment");
 
                     b.Navigation("publish");
                 });
@@ -484,11 +475,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserLikesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Infrastructure.EF.Entities.CommentEntity", b =>
-                {
-                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishAlbumEntity", b =>

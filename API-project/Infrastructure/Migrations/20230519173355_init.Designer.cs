@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230519134622_init")]
+    [Migration("20230519173355_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -39,24 +39,41 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid?>("commentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("publishId")
+                    b.Property<Guid>("publishId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("commentId");
-
                     b.HasIndex("publishId");
 
-                    b.ToTable("CommentEntity");
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Infrastructure.EF.Entities.PublishAlbumEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Albums");
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishEntity", b =>
@@ -75,6 +92,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("PublishAlbumEntityId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -86,9 +106,11 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PublishAlbumEntityId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("PublishEntity");
+                    b.ToTable("Publishes");
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishTagEntity", b =>
@@ -103,7 +125,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PublishTagEntity");
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.UserEntity", b =>
@@ -342,27 +364,34 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Infrastructure.EF.Entities.UserEntity", "User")
                         .WithMany("Comments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Infrastructure.EF.Entities.CommentEntity", "comment")
-                        .WithMany("Comments")
-                        .HasForeignKey("commentId");
+                        .HasForeignKey("UserId");
 
                     b.HasOne("Infrastructure.EF.Entities.PublishEntity", "publish")
                         .WithMany("Comments")
-                        .HasForeignKey("publishId");
+                        .HasForeignKey("publishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
-
-                    b.Navigation("comment");
 
                     b.Navigation("publish");
                 });
 
+            modelBuilder.Entity("Infrastructure.EF.Entities.PublishAlbumEntity", b =>
+                {
+                    b.HasOne("Infrastructure.EF.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishEntity", b =>
                 {
+                    b.HasOne("Infrastructure.EF.Entities.PublishAlbumEntity", null)
+                        .WithMany("Publishes")
+                        .HasForeignKey("PublishAlbumEntityId");
+
                     b.HasOne("Infrastructure.EF.Entities.UserEntity", "User")
                         .WithMany("Publishes")
                         .HasForeignKey("UserId");
@@ -451,9 +480,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Infrastructure.EF.Entities.CommentEntity", b =>
+            modelBuilder.Entity("Infrastructure.EF.Entities.PublishAlbumEntity", b =>
                 {
-                    b.Navigation("Comments");
+                    b.Navigation("Publishes");
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishEntity", b =>

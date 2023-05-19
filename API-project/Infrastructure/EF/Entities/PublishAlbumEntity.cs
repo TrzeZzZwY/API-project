@@ -14,13 +14,6 @@ namespace Infrastructure.EF.Entities
         {
             
         }
-        public PublishAlbumEntity(Guid id, string name, Status status, ISet<PublishEntity>? publishes)
-        {
-            Id = id;
-            Name = name;
-            Status = status;
-            Publishes = publishes ?? new HashSet<PublishEntity>();
-        }
 
         public Guid Id { get; set; }
         public UserEntity User { get; set; }

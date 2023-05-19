@@ -145,8 +145,7 @@ namespace WebApi.Dto.Mappers
              return new Comment(
                  userId: p.UserId,
                  content: p.CommentContent,
-                 isEdited: false,
-                 comments: null
+                 isEdited: false
             );
         }
         public IEnumerable<Comment> MapFromInput(IEnumerable<CommentInputDto> p)

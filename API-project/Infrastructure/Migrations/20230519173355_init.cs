@@ -52,7 +52,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PublishTagEntity",
+                name: "Tags",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -60,7 +60,7 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PublishTagEntity", x => x.Id);
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -82,6 +82,25 @@ namespace Infrastructure.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Albums",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Albums", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Albums_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -170,7 +189,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PublishEntity",
+                name: "Publishes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -179,48 +198,48 @@ namespace Infrastructure.Migrations
                     Camera = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    PublishAlbumEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PublishEntity", x => x.Id);
+                    table.PrimaryKey("PK_Publishes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PublishEntity_AspNetUsers_UserId",
+                        name: "FK_Publishes_Albums_PublishAlbumEntityId",
+                        column: x => x.PublishAlbumEntityId,
+                        principalTable: "Albums",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Publishes_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "CommentEntity",
+                name: "Comments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    publishId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CommentContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsEdited = table.Column<bool>(type: "bit", nullable: false),
-                    publishId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    commentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    IsEdited = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommentEntity", x => x.Id);
+                    table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CommentEntity_AspNetUsers_UserId",
+                        name: "FK_Comments_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Comments_Publishes_publishId",
+                        column: x => x.publishId,
+                        principalTable: "Publishes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CommentEntity_CommentEntity_commentId",
-                        column: x => x.commentId,
-                        principalTable: "CommentEntity",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_CommentEntity_PublishEntity_publishId",
-                        column: x => x.publishId,
-                        principalTable: "PublishEntity",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -234,15 +253,15 @@ namespace Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Publish_PublishTag", x => new { x.PublishTagsId, x.PublishesId });
                     table.ForeignKey(
-                        name: "FK_Publish_PublishTag_PublishEntity_PublishesId",
+                        name: "FK_Publish_PublishTag_Publishes_PublishesId",
                         column: x => x.PublishesId,
-                        principalTable: "PublishEntity",
+                        principalTable: "Publishes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Publish_PublishTag_PublishTagEntity_PublishTagsId",
+                        name: "FK_Publish_PublishTag_Tags_PublishTagsId",
                         column: x => x.PublishTagsId,
-                        principalTable: "PublishTagEntity",
+                        principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -264,12 +283,17 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserLikes_PublishEntity_PublishLikesId",
+                        name: "FK_UserLikes_Publishes_PublishLikesId",
                         column: x => x.PublishLikesId,
-                        principalTable: "PublishEntity",
+                        principalTable: "Publishes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Albums_UserId",
+                table: "Albums",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -311,18 +335,13 @@ namespace Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommentEntity_commentId",
-                table: "CommentEntity",
-                column: "commentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommentEntity_publishId",
-                table: "CommentEntity",
+                name: "IX_Comments_publishId",
+                table: "Comments",
                 column: "publishId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommentEntity_UserId",
-                table: "CommentEntity",
+                name: "IX_Comments_UserId",
+                table: "Comments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -331,8 +350,13 @@ namespace Infrastructure.Migrations
                 column: "PublishesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PublishEntity_UserId",
-                table: "PublishEntity",
+                name: "IX_Publishes_PublishAlbumEntityId",
+                table: "Publishes",
+                column: "PublishAlbumEntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Publishes_UserId",
+                table: "Publishes",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -360,7 +384,7 @@ namespace Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CommentEntity");
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Publish_PublishTag");
@@ -372,10 +396,13 @@ namespace Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "PublishTagEntity");
+                name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "PublishEntity");
+                name: "Publishes");
+
+            migrationBuilder.DropTable(
+                name: "Albums");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -15,17 +15,7 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public PublishAlbum Create(string userLogin, PublishAlbum album)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PublishAlbum Delete(Guid userId, string albumName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PublishAlbum Delete(string userLogin, string albumName)
+        public PublishAlbum Delete(Guid ownerId, string albumName)
         {
             throw new NotImplementedException();
         }
@@ -40,12 +30,7 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<PublishAlbum> GetAllFor(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<PublishAlbum> GetAllFor(string userLogin)
+        public IEnumerable<PublishAlbum> GetAllFor(Guid ownerId)
         {
             throw new NotImplementedException();
         }
@@ -55,17 +40,27 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public PublishAlbum GetByOne(Guid userID, string albumName)
+        public PublishAlbum GetByOne(Guid ownerId, string albumName)
         {
             throw new NotImplementedException();
         }
 
-        public PublishAlbum GetByOne(string userLogin, string albumName)
+        public bool IsPrivate(Guid ownerId, string albumName)
         {
             throw new NotImplementedException();
         }
 
-        public PublishAlbum Update(Guid albumId, PublishAlbum album)
+        public bool IsPrivate(Guid albumId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsUserOwner(Guid userId, Guid albumId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public PublishAlbum Update(Guid ownerId, PublishAlbum album)
         {
             throw new NotImplementedException();
         }

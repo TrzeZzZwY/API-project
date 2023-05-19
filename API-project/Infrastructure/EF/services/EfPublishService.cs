@@ -15,17 +15,7 @@ namespace Infrastructure.EF.Services
             throw new NotImplementedException();
         }
 
-        public Publish Create(string userLogin, string? albumName, Publish publish)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish Delete(Guid userId, string? albumName, string imageName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish Delete(string userLogin, string? albumName, string imageName)
+        public Publish Delete(Guid ownerId, string? albumName, string imageName)
         {
             throw new NotImplementedException();
         }
@@ -40,32 +30,7 @@ namespace Infrastructure.EF.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Publish> GetAllFor(Guid userId, string? albumName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Publish> GetAllFor(string userLogin, string? albumName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish GetByOne(Guid publishId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish GetByOne(Guid albumId, string imageName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish GetByOne(Guid userID, string? albumName, string imageName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Publish GetByOne(string userLogin, string? albumName, string imageName)
+        public IEnumerable<Publish> GetAllFor(Guid ownerId, string? albumName)
         {
             throw new NotImplementedException();
         }
@@ -75,12 +40,57 @@ namespace Infrastructure.EF.Services
             throw new NotImplementedException();
         }
 
-        public bool Move(Guid userId, string? targetAlbumName, Guid publishId)
+        public uint GetLikes(Guid ownerId, string? albumName, string imageName)
         {
             throw new NotImplementedException();
         }
 
-        public bool Move(string userLogin, string? targetAlbumName, Guid publishId)
+        public uint GetLikes(Guid publishId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Publish GetOne(Guid publishId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Publish GetOne(Guid albumId, string imageName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Publish GetOne(Guid ownerId, string? albumName, string imageName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsPrivate(Guid ownerId, string? albumName, string imageName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsPrivate(Guid publishId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsUserOwner(Guid userId, Guid publishId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint Like(Guid ownerId, string? albumName, string imageName, Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint Like(Guid userId, Guid publishId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Move(string? targetAlbumName, Guid publishId)
         {
             throw new NotImplementedException();
         }
