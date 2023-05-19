@@ -9,5 +9,6 @@ namespace Infrastructure.EF.Entities
 {
     public class UserRoleEntity : IdentityRole
     {
+
     }
 }

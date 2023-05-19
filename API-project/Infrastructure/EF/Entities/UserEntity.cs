@@ -10,15 +10,20 @@ namespace Infrastructure.EF.Entities
 {
     public class UserEntity : IdentityUser
     {
-        public UserEntity(string login, ISet<PublishAlbumEntity>? publishes, ISet<PublishAlbumEntity>? userPublishLikes):base()
+        public UserEntity()
+        {
+            
+        }
+        public UserEntity(string login, ISet<PublishEntity>? publishes, ISet<PublishEntity>? userPublishLikes):base()
         {
             Login = login;
-            Publishes = publishes ?? new HashSet<PublishAlbumEntity>();
-            UserPublishLikes = userPublishLikes ?? new HashSet<PublishAlbumEntity>();
+            Publishes = publishes ?? new HashSet<PublishEntity>();
+            PublishLikes = userPublishLikes ?? new HashSet<PublishEntity>();
         }
 
         public string Login { get; set; }
-        public ISet<PublishAlbumEntity> Publishes { get; set; }
-        public ISet<PublishAlbumEntity> UserPublishLikes { get; set; }
+        public ISet<PublishEntity> Publishes { get; set; }
+        public ISet<PublishEntity> PublishLikes { get; set; }
+        public ISet<CommentEntity> Comments { get; set; }
     }
 }

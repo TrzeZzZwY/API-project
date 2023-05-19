@@ -10,10 +10,21 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF
 {
-    public class AppDbContext : IdentityDbContext<UserEntity, UserRoleEntity,string>
+    public class AppDbContext : IdentityDbContext<UserEntity, UserRoleEntity, string>
     {
+        public DbSet<CommentEntity> Comments { get; set; }
+        public DbSet<PublishAlbumEntity> Albums { get; set; }
+        public DbSet<PublishEntity> Publishes {get;set;}
+        public DbSet<PublishTagEntity> Tags { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
+        }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<UserEntity>().HasMany(e => e.Publishes).WithOne(e => e.User);
+            builder.Entity<UserEntity>().HasMany(e => e.PublishLikes).WithMany(e => e.UserLikes).UsingEntity(j => j.ToTable("UserLikes"));
+            builder.Entity<PublishTagEntity>().HasMany(e => e.Publishes).WithMany(e => e.PublishTags).UsingEntity(j => j.ToTable("Publish_PublishTag"));
+            base.OnModelCreating(builder); 
         }
     }
 }

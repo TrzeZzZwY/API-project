@@ -138,7 +138,7 @@ namespace Infrastructure.EF.Mappers
                 description: p.Description,
                 uploadDate: p.UploadDate,
                 status: p.Status,
-                userLikes: p.UserPublishLikes.Select(e =>Guid.Parse(e.Id)).ToHashSet(),
+                userLikes: p.UserLikes.Select(e =>Guid.Parse(e.Id)).ToHashSet(),
                 publishTags: MapFromEntity(p.PublishTags).ToHashSet(),
                 comments: MapFromEntity(p.Comments).ToHashSet()
                 );
