@@ -9,14 +9,5 @@ namespace Infrastructure.EF.Entities
 {
     public class UserRoleEntity : IdentityRole
     {
-        public UserRoleEntity() : base()
-        {
-
-        }
-
-        public UserRoleEntity(string roleName) : base(roleName)
-        {
-        }
-
     }
 }
