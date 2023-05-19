@@ -10,25 +10,31 @@ namespace AppCore.Interfaces.Services
     public interface IPublishService
     {
         public IEnumerable<Publish> GetAll();
-        public IEnumerable<Publish> GetAllFor(Guid userId,string? albumName);
-        public IEnumerable<Publish> GetAllFor(string userLogin, string? albumName);
-        public Publish GetByOne(Guid publishId);
-        public Publish GetByOne(Guid albumId, string imageName);
-        public Publish GetByOne(Guid userID, string? albumName, string imageName);
-        public Publish GetByOne(string userLogin, string? albumName, string imageName);
+        public IEnumerable<Publish> GetAllFor(Guid ownerId, string? albumName);
+        public Publish GetOne(Guid publishId);
+        public Publish GetOne(Guid albumId, string imageName);
+        public Publish GetOne(Guid ownerId, string? albumName, string imageName);
 
         public Publish Create(Guid userID, string? albumName, Publish publish);
-        public Publish Create(string userLogin, string? albumName, Publish publish);
 
-        public Publish Delete(Guid userId, string? albumName, string imageName);
-        public Publish Delete(string userLogin, string? albumName, string imageName);
+        public Publish Delete(Guid ownerId, string? albumName, string imageName);
         public Publish Delete(Guid publishId);
 
         public Publish Update(Guid publishId, Publish publish);
  
-        public bool Move(Guid userId, string? targetAlbumName, Guid publishId);
-        public bool Move(string userLogin, string? targetAlbumName, Guid publishId);
+        public bool Move(string? targetAlbumName, Guid publishId);
 
         public string GetImgPath(Guid publishId);
+
+        public bool IsUserOwner(Guid userId, Guid publishId);
+
+        public bool IsPrivate(Guid ownerId, string? albumName, string imageName);
+        public bool IsPrivate(Guid publishId);
+
+        public uint GetLikes(Guid ownerId, string? albumName, string imageName);
+        public uint GetLikes(Guid publishId);
+
+        public uint Like(Guid ownerId, string? albumName, string imageName,Guid userId);
+        public uint Like(Guid userId, Guid publishId);
     }
 }
