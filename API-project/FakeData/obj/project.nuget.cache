@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "obF5vMJQ5KLLsjTyO+nr4uBcRuSgJ6ruui0P/f/Bu8wJsG2hNOOFns/fVknKKdWNExvaXJQ60GzPwvtR76jAqQ==",
+  "dgSpecHash": "yTrQ+CXrJwiQdG194km5SLsDq3KOhVq1kNoU5shnxGmSRDyfkFTQqsWZpWPpBQSJE6Mh2pr3kDT7oZ7wWuJcsA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\jasie\\source\\repos\\API-project\\API-project\\FakeData\\FakeData.csproj",
+  "projectFilePath": "C:\\Users\\piotr\\Desktop\\Api\\pio\\API-project\\FakeData\\FakeData.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
