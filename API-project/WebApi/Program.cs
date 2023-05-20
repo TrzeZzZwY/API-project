@@ -5,6 +5,7 @@ using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Infrastructure.EF.services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ContextConnection") 
@@ -23,8 +24,9 @@ builder.Services.AddIdentity<UserEntity, UserRoleEntity>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 //Services
-builder.Services.AddScoped<IPublishService, EfPublishService>();
+builder.Services.AddScoped<ITagService, EfTagService>();
 builder.Services.AddScoped<ICommentService, EfCommentService>();
+builder.Services.AddScoped<IPublishService, EfPublishService>();
 builder.Services.AddScoped<IAlbumService, EfAlbumService>();
 
 var app = builder.Build();

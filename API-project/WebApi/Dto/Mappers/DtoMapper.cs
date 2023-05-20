@@ -121,6 +121,7 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             return new Publish(
+                userId:p.UserId,
                 imageName: p.ImageName,
                 camera: p.Camera,
                 description: p.Description,
@@ -144,6 +145,7 @@ namespace WebApi.Dto.Mappers
                 throw new ArgumentException(message: "Argument can't be null");
              return new Comment(
                  userId: p.UserId,
+                 publishId:p.PublishId,
                  content: p.CommentContent,
                  isEdited: false
             );
@@ -160,7 +162,7 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new PublishTag(name: p.TagName);
+            return new PublishTag(name: p.TagName,publishes:null);
         }
         public IEnumerable<PublishTag> MapFromInput(IEnumerable<PublishTagInputDto> p)
         {

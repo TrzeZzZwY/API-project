@@ -10,11 +10,12 @@ namespace AppCore.Models
 {
     public class Publish : IIdentity<Guid>
     {
-        public Publish(string imageName, Cameras? camera,
+        public Publish(string imageName, Cameras? camera, Guid userId,
             string? description, Status? status, ISet<Guid>? userLikes,
             ISet<PublishTag>? publishTags, ISet<Comment>? comments, DateTime? uploadDate, Guid? id = null)
         {
             Id = id ?? Guid.Empty;
+            UserId = userId;
             ImageName = imageName;
             Camera = camera ?? Cameras.None;
             Description = description;
@@ -27,6 +28,7 @@ namespace AppCore.Models
         }
 
         public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string ImageName { get; set; }
         public Cameras Camera { get; set; }
         public string? Description { get; set; }

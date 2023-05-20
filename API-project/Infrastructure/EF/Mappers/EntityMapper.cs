@@ -1,5 +1,7 @@
 ﻿using AppCore.Models;
 using Infrastructure.EF.Entities;
+using Infrastructure.EF.services;
+using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -12,10 +14,14 @@ namespace Infrastructure.EF.Mappers
     public class EntityMapper
     {
         private readonly UserManager<UserEntity> _userManager;
+        private readonly EfPublishService _publishService;
+        private readonly EfTagService _tagService;
 
-        public EntityMapper(UserManager<UserEntity> userManager)
+        public EntityMapper(UserManager<UserEntity> userManager, EfPublishService publishService, EfTagService tagService)
         {
             _userManager = userManager;
+            _publishService = publishService;
+            _tagService = tagService;
         }
 
         public CommentEntity MapToEntity(Comment p)
@@ -26,9 +32,13 @@ namespace Infrastructure.EF.Mappers
             var user = _userManager.FindByIdAsync(p.Id.ToString()).Result;
             if (user is null)
                 throw new Exception("User Not Foud");
-            //return new CommentEntity(
-            //    );
-            throw new NotImplementedException();
+            return new CommentEntity()
+            {
+                User = user,
+                publish = MapToEntity(_publishService.GetOne(p.PublishId)),
+                CommentContent = p.Content,
+                IsEdited = p.IsEdited                
+            };
         }
         public IEnumerable<CommentEntity> MapToEntity(IEnumerable<Comment> p)
         {
@@ -42,15 +52,23 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            /*return new PublishEntity(
-                userPublishLikes: p.UserPublishLikes.Select(
+            return new PublishEntity()
+            {
+                Camera = p.Camera,
+                Comments = MapToEntity(p.Comments).ToHashSet(),
+                Description = p.Description,
+                ImageName = p.ImageName,
+                PublishTags = MapToEntity(p.PublishTags).ToHashSet(),
+                Status = p.Status,
+                UploadDate = p.UploadDate,
+                User =_userManager.FindByIdAsync(p.UserId.ToString()).Result,
+                UserLikes = p.UserPublishLikes.Select(
                     e => _userManager.FindByIdAsync(
                         e.ToString()
                         )
                     .Result)
                 .ToHashSet(),// XD
-
-                );*/
+            };
             throw new NotImplementedException();
         }
         public IEnumerable<PublishEntity> MapToEntity(IEnumerable<Publish> p)
@@ -65,9 +83,12 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            //return new PublishTagEntity(
-            //    );
-            throw new NotImplementedException();
+            return new PublishTagEntity()
+            {
+                Name = p.Name
+                //Publishes = MapToEntity(_tagService.GetAllPublishesForTag(p.Id)).ToHashSet()
+            };
+
         }
         public IEnumerable<PublishTagEntity> MapToEntity(IEnumerable<PublishTag> p)
         {
@@ -116,6 +137,7 @@ namespace Infrastructure.EF.Mappers
 
             return new Publish(
                 id: p.Id,
+                userId: Guid.Parse(p.User.Id),
                 imageName: p.ImageName,
                 camera: p.Camera,
                 description: p.Description,
@@ -140,7 +162,8 @@ namespace Infrastructure.EF.Mappers
 
             return new PublishTag(
                     id:p.Id,
-                    name:p.Name
+                    name:p.Name,
+                    publishes:null
                 );
         }
         public IEnumerable<PublishTag> MapFromEntity(IEnumerable<PublishTagEntity> p)
