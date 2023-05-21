@@ -47,7 +47,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("publishId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishAlbumEntity", b =>
@@ -70,7 +70,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Albums");
+                    b.ToTable("Albums", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishEntity", b =>
@@ -107,7 +107,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Publishes");
+                    b.ToTable("Publishes", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishTagEntity", b =>
@@ -122,7 +122,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.EF.Entities.UserEntity", b =>

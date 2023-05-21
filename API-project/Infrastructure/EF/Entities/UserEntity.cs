@@ -14,5 +14,6 @@ namespace Infrastructure.EF.Entities
         public ISet<PublishEntity> Publishes { get; set; }
         public ISet<PublishEntity> PublishLikes { get; set; }
         public ISet<CommentEntity> Comments { get; set; }
+        public ISet<PublishAlbumEntity> Albums { get; set; }
     }
 }

@@ -69,7 +69,6 @@ namespace Infrastructure.EF.Mappers
                     .Result)
                 .ToHashSet(),// XD
             };
-            throw new NotImplementedException();
         }
         public IEnumerable<PublishEntity> MapToEntity(IEnumerable<Publish> p)
         {
@@ -102,9 +101,14 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            //return new PublishAlbumEntity(
-            //    );
-            throw new NotImplementedException();
+            return new PublishAlbumEntity()
+            {
+                Name = p.Name,
+                Status = p.Status,
+                User = _userManager.FindByIdAsync(p.UserId.ToString()).Result,
+                Publishes = MapToEntity(p.Publishes).ToHashSet()
+            };
+
         }
         public IEnumerable<PublishAlbumEntity> MapToEntity(IEnumerable<PublishAlbum> p)
         {
@@ -119,9 +123,14 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            //return new Comment(
-            //    );
-            throw new NotImplementedException();
+            return new Comment(
+
+                id : p.Id,
+                content : p.CommentContent,
+                isEdited : p.IsEdited,
+                publishId : p.publish.Id,
+                userId : Guid.Parse(p.User.Id)
+            );
         }
         public IEnumerable<Comment> MapFromEntity(IEnumerable<CommentEntity> p)
         {
@@ -180,6 +189,7 @@ namespace Infrastructure.EF.Mappers
 
             return new PublishAlbum(
                     id: p.Id,
+                    userId: Guid.Parse(p.User.Id),
                     name: p.Name,
                     status:p.Status,
                     publishes:MapFromEntity(p.Publishes).ToHashSet()
