@@ -104,6 +104,7 @@ namespace WebApi.Dto.Mappers
                 throw new ArgumentException(message: "Argument can't be null");
 
             return new PublishAlbum(
+                userId:p.UserId,
                 name: p.Name,
                 status: p.Status,
                 publishes: null
