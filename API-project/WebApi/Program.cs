@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using WebApi.Dto.Mappers;
+using Infrastructure.EF.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ContextConnection")
@@ -54,11 +56,14 @@ builder.Services.AddAuthentication(opt =>
         };
     });
 builder.Services.AddAuthorization();
+
 //Services
-builder.Services.AddScoped<ITagService, EfTagService>();
-builder.Services.AddScoped<ICommentService, EfCommentService>();
-builder.Services.AddScoped<IPublishService, EfPublishService>();
+builder.Services.AddScoped<IPublishService,EfPublishService>();
 builder.Services.AddScoped<IAlbumService, EfAlbumService>();
+builder.Services.AddScoped<ICommentService, EfCommentService>();
+builder.Services.AddScoped<ITagService, EfTagService>();
+
+
 
 builder.Services.AddSwaggerGen(options =>
 {

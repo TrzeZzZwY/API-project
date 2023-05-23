@@ -5,9 +5,8 @@ namespace WebApi.Dto.Input
 {
     public class PublishInputDto
     {
-        public PublishInputDto(Guid userId, string imageName, Cameras? camera, string? description, Status? status, ISet<PublishTag>? tags, IFormFile image)
+        public PublishInputDto( string imageName, Cameras? camera, string? description, Status? status, ISet<PublishTag>? tags, IFormFile image)
         {
-            UserId = userId;
             ImageName = imageName;
             Camera = camera ?? Cameras.None;
             Description = description?? String.Empty;
@@ -15,7 +14,6 @@ namespace WebApi.Dto.Input
             Tags = tags ?? new HashSet<PublishTag>();
             Image = image;
         }
-        public Guid UserId { get; set; }
         public string ImageName { get; set; }
         public Cameras Camera { get; set; }
         public string Description { get; set; }

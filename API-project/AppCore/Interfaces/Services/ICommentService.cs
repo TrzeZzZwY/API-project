@@ -9,20 +9,16 @@ namespace AppCore.Interfaces.Services
 {
     public interface ICommentService
     {
-        public IEnumerable<Comment> GetAll();
-        public IEnumerable<Comment> GetAllForPublish(Guid publishId);
-        public IEnumerable<Comment> GetAllForComment(Guid commentId);
-
-        public Comment GetOne(Guid commentId);
-
-        public Comment Create(Comment comment, Guid publishId);
-        public Comment Create(Comment comment, Guid albumId, string imageName);
-        public Comment Create(Comment comment, Guid userId,string? albumName, string imageName);
-        public Comment Create2(Comment comment, Guid commentId);
-
-        public Comment Delete(Guid commentId);
-
-        public Comment Update(Guid commentId, Comment comment);
+        public Task<IEnumerable<Comment>> GetAll();
+        public Task<IEnumerable<Comment>> GetAllForPublish(Guid publishId);
+        public Task<IEnumerable<Comment>> GetAllForComment(Guid commentId);
+        public Task<Comment> GetOne(Guid commentId);
+        public Task<Comment> Create(Comment comment, Guid publishId);
+        public Task<Comment> Create(Comment comment, Guid albumId, string imageName);
+        public Task<Comment> Create(Comment comment, Guid userId,string? albumName, string imageName);
+        public Task<Comment> Create2(Comment comment, Guid commentId);
+        public Task<Comment> Delete(Guid commentId);
+        public Task<Comment> Update(Guid commentId, Comment comment);
 
     }
 }

@@ -9,22 +9,22 @@ namespace AppCore.Interfaces.Services
 {
     public interface IAlbumService
     {
-        public IEnumerable<PublishAlbum> GetAll();
-        public IEnumerable<PublishAlbum> GetAllFor(Guid ownerId);
+        public Task<IEnumerable<PublishAlbum>> GetAll();
+        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid ownerId);
 
-        public PublishAlbum GetByOne(Guid publishAlbumId);
-        public PublishAlbum GetByOne(Guid ownerId, string albumName);
+        public Task<PublishAlbum> GetByOne(Guid publishAlbumId);
+        public Task<PublishAlbum> GetByOne(Guid ownerId, string albumName);
+            
+        public Task<PublishAlbum> Create(Guid userId,PublishAlbum album);
+               
+        public Task<PublishAlbum> Delete(Guid ownerId, string albumName);
+        public Task<PublishAlbum> Delete(Guid albumId);
 
-        public PublishAlbum Create(Guid userId,PublishAlbum album);
+        public Task<PublishAlbum> Update(Guid ownerId, PublishAlbum album);
 
-        public PublishAlbum Delete(Guid ownerId, string albumName);
-        public PublishAlbum Delete(Guid albumId);
+        public Task<bool> IsUserOwner(Guid userId, Guid albumId);
 
-        public PublishAlbum Update(Guid ownerId, PublishAlbum album);
-
-        public bool IsUserOwner(Guid userId, Guid albumId);
-
-        public bool IsPrivate(Guid ownerId, string albumName);
-        public bool IsPrivate(Guid albumId);
+        public Task<bool> IsPrivate(Guid ownerId, string albumName);
+        public Task<bool> IsPrivate(Guid albumId);
     }
 }

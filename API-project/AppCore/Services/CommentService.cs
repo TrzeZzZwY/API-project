@@ -10,52 +10,52 @@ namespace AppCore.Services
 {
     public class CommentService : ICommentService
     {
-        public Comment Create(Comment comment, Guid publishId)
+        public Task<Comment> Create(Comment comment, Guid publishId)
         {
             throw new NotImplementedException();
         }
 
-        public Comment Create(Comment comment, Guid albumId, string imageName)
+        public Task<Comment> Create(Comment comment, Guid albumId, string imageName)
         {
             throw new NotImplementedException();
         }
 
-        public Comment Create(Comment comment, Guid userId, string? albumName, string imageName)
+        public Task<Comment> Create(Comment comment, Guid userId, string? albumName, string imageName)
         {
             throw new NotImplementedException();
         }
 
-        public Comment Create2(Comment comment, Guid commentId)
+        public Task<Comment> Create2(Comment comment, Guid commentId)
         {
             throw new NotImplementedException();
         }
 
-        public Comment Delete(Guid commentId)
+        public Task<Comment> Delete(Guid commentId)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Comment> GetAll()
+        public Task<IEnumerable<Comment>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Comment> GetAllForComment(Guid commentId)
+        public Task<IEnumerable<Comment>> GetAllForComment(Guid commentId)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Comment> GetAllForPublish(Guid publishId)
+        public Task<IEnumerable<Comment>> GetAllForPublish(Guid publishId)
         {
             throw new NotImplementedException();
         }
 
-        public Comment GetOne(Guid commentId)
+        public Task<Comment> GetOne(Guid commentId)
         {
             throw new NotImplementedException();
         }
 
-        public Comment Update(Guid commentId, Comment comment)
+        public Task<Comment> Update(Guid commentId, Comment comment)
         {
             throw new NotImplementedException();
         }

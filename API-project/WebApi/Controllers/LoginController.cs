@@ -99,7 +99,7 @@ namespace WebApi.Controllers
                 _config["JwtSettings:ValidIssuer"],
                 _config["JwtSettings:ValidAudience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(3),
+                expires: DateTime.Now.AddMinutes(10),
                 signingCredentials: credentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);

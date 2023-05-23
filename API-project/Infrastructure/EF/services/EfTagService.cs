@@ -10,27 +10,27 @@ namespace Infrastructure.EF.services
 {
     public class EfTagService : ITagService
     {
-        public IEnumerable<PublishTag> GetAll()
+        public Task<IEnumerable<PublishTag>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<PublishTag> GetAll(IEnumerable<Guid> tagsId)
+        public Task<IEnumerable<PublishTag>> GetAll(IEnumerable<Guid> tagsId)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<PublishTag> GetAllFor(Guid publishId)
+        public Task<IEnumerable<PublishTag>> GetAllFor(Guid publishId)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Publish> GetAllPublishesForTag(Guid tagId)
+        public Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid tagId)
         {
             throw new NotImplementedException();
         }
 
-        public PublishTag GetTag(Guid tagId)
+        public Task<PublishTag> GetTag(Guid tagId)
         {
             throw new NotImplementedException();
         }

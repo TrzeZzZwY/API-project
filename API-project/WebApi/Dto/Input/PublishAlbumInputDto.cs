@@ -6,14 +6,11 @@ namespace WebApi.Dto.Input
 {
     public class PublishAlbumInputDto
     {
-        public PublishAlbumInputDto(Guid userId,string name, Status status)
+        public PublishAlbumInputDto(string name, Status status)
         {
-            UserId = userId;
             Name = name;
             Status = status;
         }
-        public Guid UserId { get; set; }
-
         public string Name { get; set; }
         public Status Status { get; set; }
     }

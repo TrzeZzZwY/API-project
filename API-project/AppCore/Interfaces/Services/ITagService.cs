@@ -10,10 +10,10 @@ namespace AppCore.Interfaces.Services
     public interface ITagService
     {
         //TODO
-        public IEnumerable<PublishTag> GetAll();
-        public IEnumerable<PublishTag> GetAll(IEnumerable<Guid> tagsId);
-        public IEnumerable<PublishTag> GetAllFor(Guid publishId);
-        public IEnumerable<Publish> GetAllPublishesForTag(Guid tagId);
-        public PublishTag GetTag(Guid tagId);
+        public Task<IEnumerable<PublishTag>> GetAll();
+        public Task<IEnumerable<PublishTag>> GetAll(IEnumerable<Guid> tagsId);
+        public Task<IEnumerable<PublishTag>> GetAllFor(Guid publishId);
+        public Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid tagId);
+        public Task<PublishTag> GetTag(Guid tagId);
     }
 }

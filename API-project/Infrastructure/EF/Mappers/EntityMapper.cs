@@ -11,43 +11,30 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF.Mappers
 {
-    public class EntityMapper
+    public static class EntityMapper
     {
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly EfPublishService _publishService;
-        private readonly EfTagService _tagService;
 
-        public EntityMapper(UserManager<UserEntity> userManager, EfPublishService publishService, EfTagService tagService)
-        {
-            _userManager = userManager;
-            _publishService = publishService;
-            _tagService = tagService;
-        }
 
-        public CommentEntity MapToEntity(Comment p)
+        public static CommentEntity Map(Comment p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            var user = _userManager.FindByIdAsync(p.Id.ToString()).Result;
-            if (user is null)
-                throw new Exception("User Not Foud");
             return new CommentEntity()
             {
-                User = user,
-                publish = MapToEntity(_publishService.GetOne(p.PublishId)),
+                publish = Map(p.Publish),
                 CommentContent = p.Content,
-                IsEdited = p.IsEdited                
+                IsEdited = p.IsEdited
             };
         }
-        public IEnumerable<CommentEntity> MapToEntity(IEnumerable<Comment> p)
+        public static IEnumerable<CommentEntity> Map(IEnumerable<Comment> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapToEntity(item);
+                yield return Map(item);
         }
-        public PublishEntity MapToEntity(Publish p)
+        public static PublishEntity Map(Publish p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
@@ -55,29 +42,20 @@ namespace Infrastructure.EF.Mappers
             return new PublishEntity()
             {
                 Camera = p.Camera,
-                Comments = MapToEntity(p.Comments).ToHashSet(),
                 Description = p.Description,
                 ImageName = p.ImageName,
-                PublishTags = MapToEntity(p.PublishTags).ToHashSet(),
                 Status = p.Status,
-                UploadDate = p.UploadDate,
-                User =_userManager.FindByIdAsync(p.UserId.ToString()).Result,
-                UserLikes = p.UserPublishLikes.Select(
-                    e => _userManager.FindByIdAsync(
-                        e.ToString()
-                        )
-                    .Result)
-                .ToHashSet(),// XD
+                UploadDate = p.UploadDate
             };
         }
-        public IEnumerable<PublishEntity> MapToEntity(IEnumerable<Publish> p)
+        public static IEnumerable<PublishEntity> Map(IEnumerable<Publish> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapToEntity(item);
+                yield return Map(item);
         }
-        public PublishTagEntity MapToEntity(PublishTag p)
+        public static PublishTagEntity Map(PublishTag p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
@@ -85,18 +63,17 @@ namespace Infrastructure.EF.Mappers
             return new PublishTagEntity()
             {
                 Name = p.Name
-                //Publishes = MapToEntity(_tagService.GetAllPublishesForTag(p.Id)).ToHashSet()
             };
 
         }
-        public IEnumerable<PublishTagEntity> MapToEntity(IEnumerable<PublishTag> p)
+        public static IEnumerable<PublishTagEntity> Map(IEnumerable<PublishTag> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapToEntity(item);
+                yield return Map(item);
         }
-        public PublishAlbumEntity MapToEntity(PublishAlbum p)
+        public static PublishAlbumEntity Map(PublishAlbum p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
@@ -104,103 +81,97 @@ namespace Infrastructure.EF.Mappers
             return new PublishAlbumEntity()
             {
                 Name = p.Name,
-                Status = p.Status,
-                User = _userManager.FindByIdAsync(p.UserId.ToString()).Result,
-                Publishes = MapToEntity(p.Publishes).ToHashSet()
+                Status = p.Status
             };
 
         }
-        public IEnumerable<PublishAlbumEntity> MapToEntity(IEnumerable<PublishAlbum> p)
+        public static IEnumerable<PublishAlbumEntity> Map(IEnumerable<PublishAlbum> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapToEntity(item);
+                yield return Map(item);
         }
 
-        public Comment MapFromEntity(CommentEntity p)
+        public static Comment Map(CommentEntity p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
             return new Comment(
 
-                id : p.Id,
-                content : p.CommentContent,
-                isEdited : p.IsEdited,
-                publishId : p.publish.Id,
-                userId : Guid.Parse(p.User.Id)
+                id: p.Id,
+                content: p.CommentContent,
+                isEdited: p.IsEdited,
+                publish: null
             );
         }
-        public IEnumerable<Comment> MapFromEntity(IEnumerable<CommentEntity> p)
+        public static IEnumerable<Comment> Map(IEnumerable<CommentEntity> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapFromEntity(item);
+                yield return Map(item);
         }
-        public Publish MapFromEntity(PublishEntity p)
+        public static Publish Map(PublishEntity p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
             return new Publish(
                 id: p.Id,
-                userId: Guid.Parse(p.User.Id),
                 imageName: p.ImageName,
                 camera: p.Camera,
                 description: p.Description,
                 uploadDate: p.UploadDate,
                 status: p.Status,
-                userLikes: p.UserLikes.Select(e =>Guid.Parse(e.Id)).ToHashSet(),
-                publishTags: MapFromEntity(p.PublishTags).ToHashSet(),
-                comments: MapFromEntity(p.Comments).ToHashSet()
+                userLikes: p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
+                publishTags: Map(p.PublishTags).ToHashSet(),
+                comments: Map(p.Comments).ToHashSet()
                 );
         }
-        public IEnumerable<Publish> MapFromEntity(IEnumerable<PublishEntity> p)
+        public static IEnumerable<Publish> Map(IEnumerable<PublishEntity> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapFromEntity(item);
+                yield return Map(item);
         }
-        public PublishTag MapFromEntity(PublishTagEntity p)
+        public static PublishTag Map(PublishTagEntity p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
             return new PublishTag(
-                    id:p.Id,
-                    name:p.Name,
-                    publishes:null
+                    id: p.Id,
+                    name: p.Name
                 );
         }
-        public IEnumerable<PublishTag> MapFromEntity(IEnumerable<PublishTagEntity> p)
+        public static IEnumerable<PublishTag> Map(IEnumerable<PublishTagEntity> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapFromEntity(item);
+                yield return Map(item);
         }
-        public PublishAlbum MapFromEntity(PublishAlbumEntity p)
+        public static PublishAlbum Map(PublishAlbumEntity p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
             return new PublishAlbum(
                     id: p.Id,
-                    userId: Guid.Parse(p.User.Id),
                     name: p.Name,
-                    status:p.Status,
-                    publishes:MapFromEntity(p.Publishes).ToHashSet()
+                    status: p.Status,
+                    publishes: p.Publishes is null ? null:Map(p.Publishes).ToHashSet()
                 );
         }
-        public IEnumerable<PublishAlbum> MapFromEntity(IEnumerable<PublishAlbumEntity> p)
+        public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumEntity> p)
         {
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
             foreach (var item in p)
-                yield return MapFromEntity(item);
+                yield return Map(item);
         }
     }
 }
