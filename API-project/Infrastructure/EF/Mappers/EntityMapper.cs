@@ -1,6 +1,6 @@
 ﻿using AppCore.Models;
 using Infrastructure.EF.Entities;
-using Infrastructure.EF.services;
+using Infrastructure.EF.Services;
 using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Identity;
 using System;

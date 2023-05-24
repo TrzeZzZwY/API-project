@@ -1,7 +1,7 @@
-﻿using AppCore.Interfaces.Services;
+﻿using AppCore.Commons.Exceptions;
+using AppCore.Interfaces.Services;
 using AppCore.Models;
 using Infrastructure.EF.Entities;
-using Infrastructure.EF.services;
 using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,12 +24,12 @@ namespace WebApi.Controllers
         private readonly EfAlbumServiceProtected _albumService;
         private readonly DtoMapper _dtoMapper;
         private readonly IPublishService _publishService;
-        public AlbumController(UserManager<UserEntity> userManager,IPublishService publishService, EfAlbumServiceProtected albumService)
+        public AlbumController(UserManager<UserEntity> userManager, IPublishService publishService, EfAlbumServiceProtected albumService)
         {
             _userManager = userManager;
             _albumService = albumService;
             _publishService = publishService;
-            _dtoMapper = new DtoMapper(userManager,publishService);
+            _dtoMapper = new DtoMapper(userManager, publishService);
         }
 
         [HttpPost]
@@ -44,10 +44,46 @@ namespace WebApi.Controllers
                 return BadRequest();
 
             var album = _dtoMapper.Map(inputDto);
-            var created = await _albumService.Create(Guid.Parse(user.Id),album);
-            var output = _dtoMapper.Map(created);
+            try
+            {
+                var created = await _albumService.Create(Guid.Parse(user.Id), album);
+                var output = _dtoMapper.Map(created);
+                return Created(output.Name, output);
+            }
+            catch (NameDuplicateException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPatch]
+        [Route("UpdateAlbum/{albumName}")]
+        public async Task<IActionResult> UpateAlbum(PublishAlbumInputDto inputDto, string albumName)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Model is not valid");
 
-            return Created(output.Name, output);
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var album = _dtoMapper.Map(inputDto);
+
+            try
+            {
+                return Ok(_dtoMapper.Map(await _albumService.Update(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName,album)));
+            }
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch(NameDuplicateException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet]
@@ -60,6 +96,69 @@ namespace WebApi.Controllers
 
             return Ok(_dtoMapper.Map(await _albumService.GetAll(Guid.Parse(user.Id))));
         }
+        [HttpGet]
+        [Route("GetAllFor/{userLogin}")]
+        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllAlbumsFor(string userLogin)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+            //if(userLogin) zawiera niedopuszcalne znaki return bad request
+            var targetUser = await _userManager.FindByNameAsync(userLogin);
+            if (targetUser is null)
+                return BadRequest();
+        
+            return Ok(_dtoMapper.Map(await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
+        }
+
+        [HttpGet]
+        [Route("GetOne/{userLogin}/{albumName}")]
+        public async Task<ActionResult<PublishAlbumOutputDto>> GetOne(string userLogin, string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var targetUser = await _userManager.FindByNameAsync(userLogin);
+            if (targetUser is null)
+                return BadRequest();
+            try
+            {
+                return Ok(_dtoMapper.Map(await _albumService.GetOne(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), albumName)));
+            }
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch
+            {
+                return NotFound();
+            }
+            
+        }
+        [HttpDelete]
+        [Route("Delete/{albumName}")]
+        public async Task<ActionResult<PublishAlbumOutputDto>> Delete(string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+         
+            try
+            {
+                return Ok(_dtoMapper.Map(await _albumService.Delete(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName)));
+            }
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+
+
 
         [HttpGet]
         [Route("Test")]

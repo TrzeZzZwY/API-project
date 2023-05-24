@@ -1,4 +1,5 @@
-﻿using AppCore.Interfaces.Services;
+﻿using AppCore.Commons.Exceptions;
+using AppCore.Interfaces.Services;
 using AppCore.Models;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
@@ -30,6 +31,8 @@ namespace Infrastructure.EF.Services
 
             var entity = EntityMapper.Map(album);
             entity.User = user;
+            if (_context.Albums.Any(e => e.User.Id == userId.ToString() && e.Name == album.Name))
+                throw new NameDuplicateException($"name: {album.Name} is already in use");
             var created = _context.Albums.Add(entity);
             _context.SaveChanges();
             var mapped = EntityMapper.Map(created.Entity);
@@ -91,6 +94,13 @@ namespace Infrastructure.EF.Services
         public async Task<PublishAlbum> Update(Guid albumId, PublishAlbum album)
         {
             var find = await GetAlbumAsync(albumId);
+
+            var sameNames = _context.Albums.FirstOrDefault(e => e.User.Id == find.User.Id.ToString() && e.Name == album.Name);
+            if (sameNames is not null &&
+                sameNames.Id != find.Id
+                )
+                throw new NameDuplicateException($"name: {album.Name} is already in use");
+
             find.Status = album.Status;
             find.Name = album.Name;
             var update = _context.Albums.Update(find);

@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.EF.services
+namespace Infrastructure.EF.Services
 {
     public class EfAlbumServiceProtected
     {
@@ -32,6 +32,11 @@ namespace Infrastructure.EF.services
             if (await _albumService.IsUserOwnerOrAdmin(userId, albumId))
                 return await _albumService.Delete(albumId);
             throw new AccessViolationException();
+        }
+        public async Task<PublishAlbum> Delete(Guid userId, Guid ownerId, string albumName)
+        {
+            var album = await _albumService.GetOne(ownerId, albumName);
+            return await Delete(userId, album.Id);
         }
         public async Task<IEnumerable<PublishAlbum>> GetAll(Guid userId)
         {

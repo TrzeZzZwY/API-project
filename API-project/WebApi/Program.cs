@@ -5,7 +5,7 @@ using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Infrastructure.EF.services;
+using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;

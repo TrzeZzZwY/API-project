@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AppCore.Interfaces.Services;
 using AppCore.Models;
 
-namespace Infrastructure.EF.services
+namespace Infrastructure.EF.Services
 {
     public class EfTagService : ITagService
     {
