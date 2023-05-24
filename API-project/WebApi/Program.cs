@@ -5,13 +5,13 @@ using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using WebApi.Dto.Mappers;
 using Infrastructure.EF.Mappers;
+using Infrastructure.EF.Services.Authorized;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ContextConnection")
@@ -63,7 +63,8 @@ builder.Services.AddScoped<IAlbumService, EfAlbumService>();
 builder.Services.AddScoped<ICommentService, EfCommentService>();
 builder.Services.AddScoped<ITagService, EfTagService>();
 
-builder.Services.AddScoped<EfAlbumServiceProtected>();
+builder.Services.AddScoped<EfAlbumServiceAuthorized>();
+builder.Services.AddScoped<EfTagServiceAuthorized>();
 
 builder.Services.AddSwaggerGen(options =>
 {

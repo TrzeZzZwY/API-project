@@ -10,17 +10,22 @@ namespace AppCore.Services
 {
     public class TagService : ITagService
     {
+        public Task<PublishTag> Create(PublishTag tag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> Delete(Guid tagId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> Delete(string tagName)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<PublishTag>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PublishTag>> GetAll(IEnumerable<Guid> tagsId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PublishTag>> GetAllFor(Guid publishId)
         {
             throw new NotImplementedException();
         }
@@ -30,7 +35,27 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public Task<PublishTag> GetTag(Guid tagId)
+        public Task<IEnumerable<Publish>> GetAllPublishesForTag(string tagName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> GetOne(Guid tagId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> GetOne(string tagName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> Update(Guid tagId, PublishTag tag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishTag> Update(string tagName, PublishTag tag)
         {
             throw new NotImplementedException();
         }

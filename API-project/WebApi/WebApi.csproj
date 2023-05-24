@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Nowy folder\**" />
+    <Content Remove="Nowy folder\**" />
+    <EmbeddedResource Remove="Nowy folder\**" />
+    <None Remove="Nowy folder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
@@ -25,10 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AppCore\AppCore.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Nowy folder\" />
   </ItemGroup>
 
 </Project>

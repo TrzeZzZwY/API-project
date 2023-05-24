@@ -2,7 +2,7 @@
 using AppCore.Interfaces.Services;
 using AppCore.Models;
 using Infrastructure.EF.Entities;
-using Infrastructure.EF.Services;
+using Infrastructure.EF.Services.Authorized;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,14 +21,12 @@ namespace WebApi.Controllers
     public class AlbumController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly EfAlbumServiceProtected _albumService;
+        private readonly EfAlbumServiceAuthorized _albumService;
         private readonly DtoMapper _dtoMapper;
-        private readonly IPublishService _publishService;
-        public AlbumController(UserManager<UserEntity> userManager, IPublishService publishService, EfAlbumServiceProtected albumService)
+        public AlbumController(UserManager<UserEntity> userManager, IPublishService publishService, EfAlbumServiceAuthorized albumService)
         {
             _userManager = userManager;
             _albumService = albumService;
-            _publishService = publishService;
             _dtoMapper = new DtoMapper(userManager, publishService);
         }
 

@@ -34,7 +34,7 @@ namespace Infrastructure.EF.Services
             if (_context.Albums.Any(e => e.User.Id == userId.ToString() && e.Name == album.Name))
                 throw new NameDuplicateException($"name: {album.Name} is already in use");
             var created = _context.Albums.Add(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             var mapped = EntityMapper.Map(created.Entity);
             return mapped;
         }
@@ -47,7 +47,7 @@ namespace Infrastructure.EF.Services
         {
             var album = await GetAlbumAsync(albumId);
             var removed = _context.Albums.Remove(album); //TODO jak nie ma kaskadowego usuwanie publikacji w albumie to trzeba dodać
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return EntityMapper.Map(removed.Entity);
         }
         public Task<IEnumerable<PublishAlbum>> GetAll()
@@ -104,7 +104,7 @@ namespace Infrastructure.EF.Services
             find.Status = album.Status;
             find.Name = album.Name;
             var update = _context.Albums.Update(find);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return EntityMapper.Map(update.Entity);
         }
         public async Task<PublishAlbum> Update(Guid ownerId, string albumName, PublishAlbum album)

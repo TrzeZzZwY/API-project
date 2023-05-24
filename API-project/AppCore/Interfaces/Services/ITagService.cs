@@ -9,11 +9,15 @@ namespace AppCore.Interfaces.Services
 {
     public interface ITagService
     {
-        //TODO
         public Task<IEnumerable<PublishTag>> GetAll();
-        public Task<IEnumerable<PublishTag>> GetAll(IEnumerable<Guid> tagsId);
-        public Task<IEnumerable<PublishTag>> GetAllFor(Guid publishId);
         public Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid tagId);
-        public Task<PublishTag> GetTag(Guid tagId);
+        public Task<IEnumerable<Publish>> GetAllPublishesForTag(string tagName);
+        public Task<PublishTag> GetOne(Guid tagId);
+        public Task<PublishTag> GetOne(string tagName);
+        public Task<PublishTag> Create(PublishTag tag);
+        public Task<PublishTag> Delete(Guid tagId);
+        public Task<PublishTag> Delete(string tagName);
+        public Task<PublishTag> Update(Guid tagId, PublishTag tag);
+        public Task<PublishTag> Update(string tagName, PublishTag tag);
     }
 }
