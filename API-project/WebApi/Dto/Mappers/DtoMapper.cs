@@ -74,7 +74,7 @@ namespace WebApi.Dto.Mappers
                 throw new Exception();
 
             return new CommentOutputDto(
-                userLogin: user.Login,
+                userLogin: user.UserName,
                 commentContent: p.Content
                 );
         }

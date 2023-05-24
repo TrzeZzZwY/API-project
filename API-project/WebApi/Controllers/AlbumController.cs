@@ -1,5 +1,7 @@
 ﻿using AppCore.Interfaces.Services;
+using AppCore.Models;
 using Infrastructure.EF.Entities;
+using Infrastructure.EF.services;
 using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +11,7 @@ using System.Data;
 using System.Security.Claims;
 using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
+using WebApi.Dto.Output;
 
 namespace WebApi.Controllers
 {
@@ -18,10 +21,10 @@ namespace WebApi.Controllers
     public class AlbumController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly IAlbumService _albumService;
+        private readonly EfAlbumServiceProtected _albumService;
         private readonly DtoMapper _dtoMapper;
         private readonly IPublishService _publishService;
-        public AlbumController(UserManager<UserEntity> userManager,IPublishService publishService,IAlbumService albumService)
+        public AlbumController(UserManager<UserEntity> userManager,IPublishService publishService, EfAlbumServiceProtected albumService)
         {
             _userManager = userManager;
             _albumService = albumService;
@@ -31,21 +34,31 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("AddAlbum")]
-        [Authorize]
         public async Task<IActionResult> AddAlbum(PublishAlbumInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
 
-            var album = _dtoMapper.Map(inputDto);
             var user = await GetCurrentUser();
-
             if (user is null)
                 return BadRequest();
 
+            var album = _dtoMapper.Map(inputDto);
             var created = await _albumService.Create(Guid.Parse(user.Id),album);
             var output = _dtoMapper.Map(created);
+
             return Created(output.Name, output);
+        }
+
+        [HttpGet]
+        [Route("GetAll")]
+        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllAlbums()
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            return Ok(_dtoMapper.Map(await _albumService.GetAll(Guid.Parse(user.Id))));
         }
 
         [HttpGet]

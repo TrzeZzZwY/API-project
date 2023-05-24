@@ -63,7 +63,7 @@ builder.Services.AddScoped<IAlbumService, EfAlbumService>();
 builder.Services.AddScoped<ICommentService, EfCommentService>();
 builder.Services.AddScoped<ITagService, EfTagService>();
 
-
+builder.Services.AddScoped<EfAlbumServiceProtected>();
 
 builder.Services.AddSwaggerGen(options =>
 {

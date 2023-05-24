@@ -163,7 +163,7 @@ namespace Infrastructure.EF.Mappers
                     id: p.Id,
                     name: p.Name,
                     status: p.Status,
-                    publishes: p.Publishes is null ? null:Map(p.Publishes).ToHashSet()
+                    publishes: null
                 );
         }
         public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumEntity> p)

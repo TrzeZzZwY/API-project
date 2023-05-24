@@ -35,7 +35,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             UserEntity newUser = new UserEntity()
             {
-                Login = user.Login,
                 Email = user.Email,
                 UserName = user.Login
             };
@@ -56,7 +55,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             UserEntity newUser = new UserEntity()
             {
-                Login = u.Login,
                 Email = u.Email,
                 UserName = u.Login
             };

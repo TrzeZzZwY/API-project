@@ -150,10 +150,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -223,13 +219,13 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "075f5cb5-5fab-463a-96eb-43f7ee87cacc",
+                            Id = "f7a1c7fa-7140-4a4f-b76e-8d1b6993de8c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "24a8ab1f-8719-46b8-b52b-9b925d911fc1",
+                            Id = "13ef3904-f977-4b9e-86f8-6f172d83c5a0",
                             Name = "User",
                             NormalizedName = "USER"
                         });

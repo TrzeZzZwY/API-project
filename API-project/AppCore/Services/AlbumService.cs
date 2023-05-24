@@ -35,12 +35,12 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public Task<PublishAlbum> GetByOne(Guid publishAlbumId)
+        public Task<PublishAlbum> GetOne(Guid publishAlbumId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PublishAlbum> GetByOne(Guid ownerId, string albumName)
+        public Task<PublishAlbum> GetOne(Guid ownerId, string albumName)
         {
             throw new NotImplementedException();
         }
@@ -55,12 +55,17 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsUserOwner(Guid userId, Guid albumId)
+        public Task<bool> IsUserOwnerOrAdmin(Guid userId, Guid albumId)
         {
             throw new NotImplementedException();
         }
 
         public Task<PublishAlbum> Update(Guid ownerId, PublishAlbum album)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PublishAlbum> Update(Guid ownerId, string albumName, PublishAlbum album)
         {
             throw new NotImplementedException();
         }
