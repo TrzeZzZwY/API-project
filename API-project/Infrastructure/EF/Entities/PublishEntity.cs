@@ -17,6 +17,7 @@ namespace Infrastructure.EF.Entities
 
         public Guid Id { get; set; }
         public UserEntity User { get; set; }
+        public PublishAlbumEntity? Album { get; set; }
         public string ImageName { get; set; }
         public Cameras Camera { get; set; }
         public string? Description { get; set; }

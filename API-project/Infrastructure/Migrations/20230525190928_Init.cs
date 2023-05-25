@@ -195,19 +195,19 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ImageName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Camera = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    PublishAlbumEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Publishes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Publishes_Albums_PublishAlbumEntityId",
-                        column: x => x.PublishAlbumEntityId,
+                        name: "FK_Publishes_Albums_AlbumId",
+                        column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -296,8 +296,8 @@ namespace Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "13ef3904-f977-4b9e-86f8-6f172d83c5a0", null, "User", "USER" },
-                    { "f7a1c7fa-7140-4a4f-b76e-8d1b6993de8c", null, "Admin", "ADMIN" }
+                    { "1c07cfea-eabb-41fd-a6a9-11f0b7c6fdc8", null, "User", "USER" },
+                    { "a600afc7-b53e-460e-be31-1b2175f71c42", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -360,9 +360,9 @@ namespace Infrastructure.Migrations
                 column: "PublishesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Publishes_PublishAlbumEntityId",
+                name: "IX_Publishes_AlbumId",
                 table: "Publishes",
-                column: "PublishAlbumEntityId");
+                column: "AlbumId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Publishes_UserId",

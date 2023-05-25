@@ -155,7 +155,50 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }
+        [HttpDelete]
+        [Route("DeleteAll")]
+        public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll()
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
 
+            try
+            {
+                return Ok(_dtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(user.Id))));
+            }
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+        [HttpDelete]
+        [Authorize(Roles = "Admin")]
+        [Route("DeleteAllFor/{userLogin}")]
+        public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll(string userLogin)
+        {
+            var user = await GetCurrentUser();
+            var targetUser = await _userManager.FindByNameAsync(userLogin);
+            if (user is null || targetUser is null)
+                return BadRequest();
+         
+            try
+            {
+                return Ok(_dtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
+            }
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
 
 
         [HttpGet]

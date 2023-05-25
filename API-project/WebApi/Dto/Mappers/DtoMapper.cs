@@ -127,7 +127,7 @@ namespace WebApi.Dto.Mappers
                 description: p.Description,
                 status: p.Status,
                 userLikes: null,
-                publishTags: p.Tags,
+                publishTags:null, //Map(p.Tags).ToHashSet(),
                 comments: null,
                 uploadDate: null
                 );

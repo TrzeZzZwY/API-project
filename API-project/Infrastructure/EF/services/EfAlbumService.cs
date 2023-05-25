@@ -16,24 +16,27 @@ namespace Infrastructure.EF.Services
     public class EfAlbumService : IAlbumService
     {
 
-        private readonly UserManager<UserEntity> _userManager;
         private readonly AppDbContext _context;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public EfAlbumService(UserManager<UserEntity> userManager,AppDbContext context)
+        public EfAlbumService(AppDbContext context, UserManager<UserEntity> userManager)
         {
-            _userManager = userManager;
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<PublishAlbum> Create(Guid userId, PublishAlbum album)
         {
-            var user = await GetUserAsync(userId);
 
             var entity = EntityMapper.Map(album);
+            var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException();
             entity.User = user;
+
             if (_context.Albums.Any(e => e.User.Id == userId.ToString() && e.Name == album.Name))
                 throw new NameDuplicateException($"name: {album.Name} is already in use");
+
             var created = _context.Albums.Add(entity);
+
             await _context.SaveChangesAsync();
             var mapped = EntityMapper.Map(created.Entity);
             return mapped;
@@ -49,6 +52,14 @@ namespace Infrastructure.EF.Services
             var removed = _context.Albums.Remove(album); //TODO jak nie ma kaskadowego usuwanie publikacji w albumie to trzeba dodać
             await _context.SaveChangesAsync();
             return EntityMapper.Map(removed.Entity);
+        }
+        public async Task<IEnumerable<PublishAlbum>> DeleteAll(Guid ownerId)
+        {
+            var albums =await GetAllAlbums(ownerId);
+            var a = albums.ToList();
+            _context.Albums.RemoveRange(albums);
+            await _context.SaveChangesAsync();
+            return EntityMapper.Map(a);
         }
         public Task<IEnumerable<PublishAlbum>> GetAll()
         {
@@ -80,13 +91,10 @@ namespace Infrastructure.EF.Services
             var album = await GetAlbumAsync(albumId);
             return album.Status == AppCore.Models.Enums.Status.private_publish ? true : false;
         }
-        public async Task<bool> IsUserOwnerOrAdmin(Guid userId, Guid albumId)
+        public async Task<bool> IsUserOwner(Guid userId, Guid albumId)
         {
-            var user = await GetUserAsync(userId);
             var album = await GetAlbumAsync(albumId);
-
-            if (await _userManager.IsInRoleAsync(user, "Admin") ||
-                album.User == user)
+            if (album.User.Id == userId.ToString())
                 return true;
 
             return false;
@@ -112,16 +120,10 @@ namespace Infrastructure.EF.Services
             var find = await GetAlbumAsync(ownerId, albumName);
             return await Update(find.Id, album);
         }
-        private async Task<UserEntity> GetUserAsync(Guid userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user is null)
-                throw new ArgumentException("Invalid user");
-            return user;
-        }
         private async Task<PublishAlbumEntity> GetAlbumAsync(Guid albumId)
         {
             var album = await _context.Albums.FindAsync(albumId);
+            await _context.Entry(album).Reference(e => e.User).LoadAsync();
             if (album is null)
                 throw new ArgumentException("Invalid album");
             return album;
@@ -133,5 +135,9 @@ namespace Infrastructure.EF.Services
                 throw new ArgumentException("Invalid album");
             return Task.FromResult(album);
         }
+        private async Task<IEnumerable<PublishAlbumEntity>> GetAllAlbums(Guid ownerId)
+        {
+            return _context.Albums.Where(e => e.User.Id == ownerId.ToString());
+        } 
     }
 }

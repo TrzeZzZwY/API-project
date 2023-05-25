@@ -79,6 +79,9 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AlbumId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Camera")
                         .HasColumnType("int");
 
@@ -88,9 +91,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("ImageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("PublishAlbumEntityId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -103,7 +103,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PublishAlbumEntityId");
+                    b.HasIndex("AlbumId");
 
                     b.HasIndex("UserId");
 
@@ -219,13 +219,13 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "f7a1c7fa-7140-4a4f-b76e-8d1b6993de8c",
+                            Id = "a600afc7-b53e-460e-be31-1b2175f71c42",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "13ef3904-f977-4b9e-86f8-6f172d83c5a0",
+                            Id = "1c07cfea-eabb-41fd-a6a9-11f0b7c6fdc8",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -395,13 +395,15 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Infrastructure.EF.Entities.PublishEntity", b =>
                 {
-                    b.HasOne("Infrastructure.EF.Entities.PublishAlbumEntity", null)
+                    b.HasOne("Infrastructure.EF.Entities.PublishAlbumEntity", "Album")
                         .WithMany("Publishes")
-                        .HasForeignKey("PublishAlbumEntityId");
+                        .HasForeignKey("AlbumId");
 
                     b.HasOne("Infrastructure.EF.Entities.UserEntity", "User")
                         .WithMany("Publishes")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Album");
 
                     b.Navigation("User");
                 });

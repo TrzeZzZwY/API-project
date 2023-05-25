@@ -19,10 +19,11 @@ namespace AppCore.Interfaces.Services
                
         public Task<PublishAlbum> Delete(Guid ownerId, string albumName);
         public Task<PublishAlbum> Delete(Guid albumId);
+        public Task<IEnumerable<PublishAlbum>> DeleteAll(Guid ownerId);
 
         public Task<PublishAlbum> Update(Guid albumId, PublishAlbum album);
         public Task<PublishAlbum> Update(Guid ownerId, string albumName, PublishAlbum album);
-        public Task<bool> IsUserOwnerOrAdmin(Guid userId, Guid albumId);
+        public Task<bool> IsUserOwner(Guid userId, Guid albumId);
 
         public Task<bool> IsPrivate(Guid ownerId, string albumName);
         public Task<bool> IsPrivate(Guid albumId);

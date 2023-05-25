@@ -25,6 +25,11 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<PublishAlbum>> DeleteAll(Guid ownerId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<PublishAlbum>> GetAll()
         {
             throw new NotImplementedException();
@@ -55,7 +60,7 @@ namespace AppCore.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsUserOwnerOrAdmin(Guid userId, Guid albumId)
+        public Task<bool> IsUserOwner(Guid userId, Guid albumId)
         {
             throw new NotImplementedException();
         }
