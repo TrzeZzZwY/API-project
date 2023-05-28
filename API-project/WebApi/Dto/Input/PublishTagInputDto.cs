@@ -2,11 +2,10 @@
 {
     public class PublishTagInputDto
     {
-        public string TagName { get; set; }
-
-        public PublishTagInputDto(string tagName)
+        public PublishTagInputDto()
         {
-            TagName = tagName;
+            
         }
+        public string TagName { get; set; }
     }
 }

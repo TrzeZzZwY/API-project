@@ -14,13 +14,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF.Services.Authorized
 {
-    public class EfAlbumServiceAuthorized
+    public class EfAlbumServiceAuthorized : ServiceAuthorization
     {
         private readonly IAlbumService _albumService;
-        private readonly UserManager<UserEntity> _userManager;
-        public EfAlbumServiceAuthorized(UserManager<UserEntity> userManager, IAlbumService albumService)
+        public EfAlbumServiceAuthorized(UserManager<UserEntity> userManager, IAlbumService albumService):base(userManager)
         {
-            _userManager = userManager;
             _albumService = albumService;
         }
         public async Task<PublishAlbum> Create(Guid userId, PublishAlbum album)
@@ -30,7 +28,7 @@ namespace Infrastructure.EF.Services.Authorized
 
         public async Task<PublishAlbum> Delete(Guid userId, Guid albumId)
         {
-            if (await _albumService.IsUserOwner(userId, albumId)||await IsUserAdmin(userId))
+            if (await _albumService.IsUserOwner(userId, albumId)||await UserIsAdmin(userId))
                 return await _albumService.Delete(albumId);
             throw new AccessViolationException();
         }
@@ -41,7 +39,7 @@ namespace Infrastructure.EF.Services.Authorized
         }
         public async Task<IEnumerable<PublishAlbum>> DeleteAll(Guid userId, Guid ownerId)
         {
-            if (await IsUserAdmin(userId) || userId == ownerId)
+            if (await UserIsAdmin(userId) || userId == ownerId)
                 return await _albumService.DeleteAll(ownerId);
             throw new AccessViolationException();
         }
@@ -71,7 +69,7 @@ namespace Infrastructure.EF.Services.Authorized
 
         public async Task<PublishAlbum> Update(Guid userId, Guid albumId, PublishAlbum album)
         {
-            if (await _albumService.IsUserOwner(userId, albumId) || await IsUserAdmin(userId))
+            if (await _albumService.IsUserOwner(userId, albumId) || await UserIsAdmin(userId))
                 return await _albumService.Update(albumId, album);
             throw new AccessViolationException();
         }
@@ -85,14 +83,7 @@ namespace Infrastructure.EF.Services.Authorized
         {
             return !await _albumService.IsPrivate(albumId) ||
                     await _albumService.IsUserOwner(userId, albumId) ||
-                    await IsUserAdmin(userId);
-        }
-        private async Task<bool> IsUserAdmin(Guid userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user is null)
-                throw new ArgumentException(message: "User not found");
-            return await _userManager.IsInRoleAsync(user, "Admin");
+                    await UserIsAdmin(userId);
         }
     }
 }

@@ -9,11 +9,6 @@ namespace AppCore.Models
 {
     public class PublishTag : IIdentity<Guid>
     {
-        public PublishTag(string name, Guid? id = null)
-        {
-            Id = id ?? Guid.Empty;
-            Name = name;
-        }
         public Guid Id { get; set; }
         public string Name { get; set; }
     }

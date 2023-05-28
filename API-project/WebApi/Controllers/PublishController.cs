@@ -1,12 +1,9 @@
 ﻿using AppCore.Interfaces.Services;
-using AppCore.Services;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services.Authorized;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
 using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
@@ -18,53 +15,48 @@ namespace WebApi.Controllers
     public class PublishController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly EfAlbumServiceAuthorized _albumService;
+        private readonly EfPublishServiceAuthorized _publishService;
         private readonly DtoMapper _dtoMapper;
         private readonly IWebHostEnvironment _hostEnvironment;
-        public PublishController(UserManager<UserEntity> userManager, IPublishService publishService,
+        public PublishController(UserManager<UserEntity> userManager,EfPublishServiceAuthorized publishService, IPublishService pser,
             EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
-            _albumService = albumService;
+            _publishService = publishService;
             _hostEnvironment = hostEnvironment;
-            _dtoMapper = new DtoMapper(userManager, publishService);
+            _dtoMapper = new DtoMapper(userManager, pser);
         }
 
         [HttpPost]
         [Route("SavePost")]
         public async Task<ActionResult<PublishOutputDto>> SavePublish(PublishInputDto input)
         {
-            if (!ModelState.IsValid)
-                return BadRequest("Model is not valid");
+            var user = await GetCurrentUser();
+            if (user is null || input.Image is null)
+                return BadRequest();
+            string extention = Path.GetExtension(input.Image.FileName);
+            if(!(extention == ".jpg" || extention ==".png"))
+                return BadRequest("Not allowed file type");
 
-            return await SavePublish("", input);
+            var publish = _dtoMapper.Map(input);
+            var entity = await _publishService.Create(Guid.Parse(user.Id), input.AlbumName, publish); // TODO zapisywanie jakie ma tagi
 
+            SaveImage(user, input,entity.FileName);
+
+            var mapped = _dtoMapper.Map(entity);
+            return Created("",mapped);
         }
         [HttpPost]
-        [Route("SavePost/{albumName}")]
-        public async Task<ActionResult<PublishOutputDto>> SavePublish(string albumName, PublishInputDto input)
+        [Route("GetImgage/{userLogin}/{imageName}/{albumName?}")]
+        public async Task<ActionResult<PublishOutputDto>> GetImg(string userLogin,string imageName, string? albumName = null)
         {
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
+           
+            return Ok();
+        }
 
-            string dir = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", user.UserName);
-            if (albumName != "")
-                dir = Path.Combine(dir, albumName);
-            Directory.CreateDirectory(dir);
-            string path = Path.Combine(dir, input.ImageName);
-            using (Stream fileStream = new FileStream(path, FileMode.Create))
-            {
-                await input.Image.CopyToAsync(fileStream);
-            }
-            return Ok();
-        }
-        [HttpPost]
-        [Route("SavePostTest/{albumName}")]
-        public async Task<ActionResult<PublishOutputDto>> SavePublishTest(string albumName, IFormFile file)
-        {
-            return Ok();
-        }
         private async Task<UserEntity?> GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -73,6 +65,17 @@ namespace WebApi.Controllers
             var userId = identity.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value;
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
+        }
+        private async void SaveImage(UserEntity user, PublishInputDto input,string FileName)
+        {
+            string dir = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", user.UserName);
+            Directory.CreateDirectory(dir);
+            string path = Path.Combine(dir, FileName + Path.GetExtension(input.Image.FileName));
+            using (Stream fileStream = new FileStream(path, FileMode.Create))
+            {
+                await input.Image.CopyToAsync(fileStream);
+            }
+
         }
     }
 }

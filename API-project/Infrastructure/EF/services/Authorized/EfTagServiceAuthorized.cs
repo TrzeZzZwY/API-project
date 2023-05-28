@@ -11,14 +11,12 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.EF.Services.Authorized
 {
-    public class EfTagServiceAuthorized
+    public class EfTagServiceAuthorized : ServiceAuthorization
     {
-        private readonly UserManager<UserEntity> _userManager;
         private readonly ITagService _tagService;
 
-        public EfTagServiceAuthorized(UserManager<UserEntity> manager, ITagService tagService)
+        public EfTagServiceAuthorized(UserManager<UserEntity> manager, ITagService tagService):base(manager)
         {
-            _userManager = manager;
             _tagService = tagService;
         }
 
@@ -56,13 +54,13 @@ namespace Infrastructure.EF.Services.Authorized
         {
             if (await UserIsAdmin(userId))
                 return await _tagService.GetAllPublishesForTag(tagId);
-            return (await _tagService.GetAllPublishesForTag(tagId)).Where(e => e.Status == Status.public_publish);
+            return (await _tagService.GetAllPublishesForTag(tagId)).Where(e => e.Status == Status.Visible);
         }
         public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, string tagName)
         {
             if (await UserIsAdmin(userId))
                 return await _tagService.GetAllPublishesForTag(tagName);
-            return (await _tagService.GetAllPublishesForTag(tagName)).Where(e => e.Status == Status.public_publish);
+            return (await _tagService.GetAllPublishesForTag(tagName)).Where(e => e.Status == Status.Visible);
         }
         public async Task<PublishTag> Delete(Guid userId,Guid tagId)
         {
@@ -76,15 +74,6 @@ namespace Infrastructure.EF.Services.Authorized
                 return await _tagService.Delete(tagName);
             throw new AccessViolationException();
         }
-        private async Task<UserEntity> FindUser(Guid userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            return user is not null ? user : throw new ArgumentException();
-        }
-        private async Task<bool> UserIsAdmin(Guid userId)
-        {
-            var user = await FindUser(userId);
-            return await _userManager.IsInRoleAsync(user, "Admin");
-        }
+
     }
 }

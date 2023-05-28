@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230525190928_Init")]
+    [Migration("20230528162546_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -89,6 +89,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageName")
@@ -222,13 +226,13 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a600afc7-b53e-460e-be31-1b2175f71c42",
+                            Id = "6e60af80-d1c9-48b2-a16d-4dac1767e504",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "1c07cfea-eabb-41fd-a6a9-11f0b7c6fdc8",
+                            Id = "d01a3fea-3d32-4562-9291-0f4d182854de",
                             Name = "User",
                             NormalizedName = "USER"
                         });

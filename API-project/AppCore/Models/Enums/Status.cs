@@ -9,8 +9,7 @@ namespace AppCore.Models.Enums
 {
     public enum Status
     {
-        // jak będzie błąd to tu
-        [Display(Name = "public")] public_publish = 0,
-        [Display(Name = "private")] private_publish = 1
+       Visible = 0,
+       Hidden = 1
     }
 }

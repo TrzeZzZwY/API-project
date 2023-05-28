@@ -31,8 +31,10 @@ namespace Infrastructure.EF.Services
 
             //sprawdzenie czy nazwa jest wolna w danym folderze
             var duplicate = await _context.Publishes.FirstOrDefaultAsync(e =>e.User.Id == user.Id && e.ImageName == entity.ImageName);
+            await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
             if(duplicate is not null)
-                if((duplicate.Album is null && albumName is null) || (duplicate.Album.Name == albumName))
+                if((duplicate.Album is null && albumName is null) ||
+                    (duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
                     throw new NameDuplicateException($"name: {entity.ImageName} is already in use in that album");
 
             entity.User = user;
@@ -42,7 +44,7 @@ namespace Infrastructure.EF.Services
                     ?? throw new ArgumentException(message:$"Invalid album name {albumName}");
                 entity.Album = album;
             }
-
+            entity.FileName = Guid.NewGuid().ToString();
 
             var saved = await _context.Publishes.AddAsync(entity);
             await _context.SaveChangesAsync();

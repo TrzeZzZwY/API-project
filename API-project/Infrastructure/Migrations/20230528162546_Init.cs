@@ -197,6 +197,7 @@ namespace Infrastructure.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AlbumId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ImageName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Camera = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UploadDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -296,8 +297,8 @@ namespace Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1c07cfea-eabb-41fd-a6a9-11f0b7c6fdc8", null, "User", "USER" },
-                    { "a600afc7-b53e-460e-be31-1b2175f71c42", null, "Admin", "ADMIN" }
+                    { "6e60af80-d1c9-48b2-a16d-4dac1767e504", null, "Admin", "ADMIN" },
+                    { "d01a3fea-3d32-4562-9291-0f4d182854de", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

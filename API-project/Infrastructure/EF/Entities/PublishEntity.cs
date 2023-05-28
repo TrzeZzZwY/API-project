@@ -19,6 +19,7 @@ namespace Infrastructure.EF.Entities
         public UserEntity User { get; set; }
         public PublishAlbumEntity? Album { get; set; }
         public string ImageName { get; set; }
+        public string FileName { get; set; }
         public Cameras Camera { get; set; }
         public string? Description { get; set; }
         public DateTime UploadDate { get; set; }

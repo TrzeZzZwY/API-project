@@ -89,7 +89,7 @@ namespace Infrastructure.EF.Services
         public async Task<bool> IsPrivate(Guid albumId)
         {
             var album = await GetAlbumAsync(albumId);
-            return album.Status == AppCore.Models.Enums.Status.private_publish ? true : false;
+            return album.Status == AppCore.Models.Enums.Status.Hidden ? true : false;
         }
         public async Task<bool> IsUserOwner(Guid userId, Guid albumId)
         {

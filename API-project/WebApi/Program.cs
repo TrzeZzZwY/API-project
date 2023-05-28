@@ -12,6 +12,9 @@ using Microsoft.OpenApi.Models;
 using WebApi.Dto.Mappers;
 using Infrastructure.EF.Mappers;
 using Infrastructure.EF.Services.Authorized;
+using Microsoft.OpenApi.Any;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using WebApi.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ContextConnection")
@@ -63,8 +66,10 @@ builder.Services.AddScoped<IAlbumService, EfAlbumService>();
 builder.Services.AddScoped<ICommentService, EfCommentService>();
 builder.Services.AddScoped<ITagService, EfTagService>();
 
+builder.Services.AddScoped<ServiceAuthorization>();
 builder.Services.AddScoped<EfAlbumServiceAuthorized>();
 builder.Services.AddScoped<EfTagServiceAuthorized>();
+builder.Services.AddScoped<EfPublishServiceAuthorized>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -91,7 +96,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-
+    //options.SchemaFilter<EnumSchemaFilter>();   
     });
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

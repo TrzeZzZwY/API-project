@@ -27,7 +27,7 @@ namespace WebApi.Dto.Mappers
             return new PublishAlbumOutputDto(
                 name: p.Name,
                 status: p.Status,
-                publishes: Map(p.Publishes)
+                publishes: null
                 );
         }
         public IEnumerable<PublishAlbumOutputDto> Map(IEnumerable<PublishAlbum> p)
@@ -47,14 +47,13 @@ namespace WebApi.Dto.Mappers
                 imageName: p.ImageName,
                 camera: p.Camera,
                 description: p.Description,
-                imgPath: _publishService.GetImgPath(p.Id).Result,
+                imgPath: " ",//_publishService.GetImgPath(p.Id).Result,
                 uploadDate: p.UploadDate,
                 status: p.Status,
-                likes: (uint)p.UserPublishLikes.Count(),
-                tags:Map(p.PublishTags),
-                comments: Map( p.Comments )
+                likes: p.UserPublishLikes is null ? 0 : (uint)p.UserPublishLikes.Count(),
+                tags: p.PublishTags is null ? null : Map(p.PublishTags),
+                comments: p.Comments is null ? null : Map(p.Comments)
                 );
-            throw new NotImplementedException();
         }
         public IEnumerable<PublishOutputDto> Map(IEnumerable<Publish> p)
         {
@@ -104,11 +103,12 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new PublishAlbum(
-                name: p.Name,
-                status: p.Status,
-                publishes: null
-                );
+            return new PublishAlbum()
+            {
+                Name = p.Name,
+                Status = p.Status,
+                Publishes = null
+            };
         }
         public IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumInputDto> p)
         {
@@ -121,16 +121,16 @@ namespace WebApi.Dto.Mappers
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
-            return new Publish(
-                imageName: p.ImageName,
-                camera: p.Camera,
-                description: p.Description,
-                status: p.Status,
-                userLikes: null,
-                publishTags:null, //Map(p.Tags).ToHashSet(),
-                comments: null,
-                uploadDate: null
-                );
+            return new Publish()
+            {
+                ImageName = p.ImageName,
+                Camera = p.Camera,
+                Description = p.Description,
+                Status = p.Status,
+                UserPublishLikes = null,
+                PublishTags = null, //Map(p.Tags).ToHashSet(),
+                Comments = null
+            };
         }
         public IEnumerable<Publish> Map(IEnumerable<PublishInputDto> p)
         {
@@ -143,11 +143,12 @@ namespace WebApi.Dto.Mappers
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
-             return new Comment(
-                 publish: _publishService.GetOne(p.PublishId).Result,
-                 content: p.CommentContent,
-                 isEdited: false
-            );
+            return new Comment()
+            {
+                Publish = _publishService.GetOne(p.PublishId).Result,
+                Content = p.CommentContent,
+                IsEdited = false
+            };
         }
         public IEnumerable<Comment> Map(IEnumerable<CommentInputDto> p)
         {
@@ -161,7 +162,7 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new PublishTag(name: p.TagName);
+            return new PublishTag() { Name = p.TagName };
         }
         public IEnumerable<PublishTag> Map(IEnumerable<PublishTagInputDto> p)
         {

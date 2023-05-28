@@ -98,13 +98,13 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            return new Comment(
-
-                id: p.Id,
-                content: p.CommentContent,
-                isEdited: p.IsEdited,
-                publish: null
-            );
+            return new Comment()
+            {
+                Id = p.Id,
+                Content = p.CommentContent,
+                IsEdited = p.IsEdited,
+                Publish = null
+            };
         }
         public static IEnumerable<Comment> Map(IEnumerable<CommentEntity> p)
         {
@@ -118,17 +118,19 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            return new Publish(
-                id: p.Id,
-                imageName: p.ImageName,
-                camera: p.Camera,
-                description: p.Description,
-                uploadDate: p.UploadDate,
-                status: p.Status,
-                userLikes: p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
-                publishTags: Map(p.PublishTags).ToHashSet(),
-                comments: Map(p.Comments).ToHashSet()
-                );
+            return new Publish()
+            {
+                Id = p.Id,
+                ImageName = p.ImageName,
+                Camera = p.Camera,
+                Description = p.Description,
+                UploadDate = p.UploadDate,
+                Status = p.Status,
+                FileName = p.FileName,
+                UserPublishLikes = p.UserLikes is null ? null : p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
+                PublishTags = p.PublishTags is null ? null : Map(p.PublishTags).ToHashSet(),
+                Comments = p.Comments is null ? null : Map(p.Comments).ToHashSet()
+            };
         }
         public static IEnumerable<Publish> Map(IEnumerable<PublishEntity> p)
         {
@@ -142,10 +144,11 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            return new PublishTag(
-                    id: p.Id,
-                    name: p.Name
-                );
+            return new PublishTag()
+            {
+                Id = p.Id,
+                Name = p.Name
+            };
         }
         public static IEnumerable<PublishTag> Map(IEnumerable<PublishTagEntity> p)
         {
@@ -159,12 +162,12 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            return new PublishAlbum(
-                    id: p.Id,
-                    name: p.Name,
-                    status: p.Status,
-                    publishes: null
-                );
+            return new PublishAlbum() {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Status = p.Status,
+                    Publishes = null
+            };
         }
         public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumEntity> p)
         {

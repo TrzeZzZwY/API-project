@@ -14,11 +14,16 @@ namespace WebApi.Dto.Input
             //Tags = tags ?? new HashSet<PublishTagInputDto>();
             Image = image;
         }*/
+        public PublishInputDto()
+        {
+            
+        }
         public string ImageName { get; set; }
+        public string? AlbumName { get; set; }
         public Cameras Camera { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public Status Status { get; set; }
-        //public ISet<PublishTagInputDto> Tags { get; set; } //TODO: Dopisać metodę w serwisie
+        public HashSet<PublishTagInputDto> Tags { get; set; } //TODO: Dopisać metodę w serwisie
         public IFormFile Image { get; set; } //TODO: Dopisać metodę w serwisie
 
     }

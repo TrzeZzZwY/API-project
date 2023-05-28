@@ -10,30 +10,19 @@ namespace AppCore.Models
 {
     public class Publish : IIdentity<Guid>
     {
-        public Publish(string imageName, Cameras? camera,
-            string? description, Status? status, ISet<Guid>? userLikes,
-            ISet<PublishTag>? publishTags, ISet<Comment>? comments, DateTime? uploadDate, Guid? id = null)
+        public Publish()
         {
-            Id = id ?? Guid.Empty;
-            ImageName = imageName;
-            Camera = camera ?? Cameras.None;
-            Description = description;
-            // DateTime.Now to słabe rozwiązanie, można za pomocą DI wstrzyknąć servis od daty
-            UploadDate = uploadDate ?? DateTime.Now;
-            Status = status ?? Status.private_publish;
-            UserPublishLikes = userLikes ?? new HashSet<Guid>();
-            PublishTags = publishTags ?? new HashSet<PublishTag>();
-            Comments = comments ?? new HashSet<Comment>();
+            UploadDate = DateTime.Now;
         }
-
         public Guid Id { get; set; }
         public string ImageName { get; set; }
-        public Cameras Camera { get; set; }
+        public string FileName { get; set; }
+        public Cameras Camera { get; set; } = Cameras.None;
         public string? Description { get; set; }
         public DateTime UploadDate { get; set; }
-        public Status Status { get; set; }
-        public ISet<Guid> UserPublishLikes { get; set; }
-        public ISet<PublishTag> PublishTags { get; set; }
-        public ISet<Comment> Comments { get; set; }
+        public Status Status { get; set; } = Status.Hidden;
+        public ISet<Guid> UserPublishLikes { get; set; } = new HashSet<Guid>();
+        public ISet<PublishTag> PublishTags { get; set; } = new HashSet<PublishTag>();
+        public ISet<Comment> Comments { get; set; } = new HashSet<Comment>();
     }
 }
