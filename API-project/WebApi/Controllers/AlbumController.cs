@@ -22,12 +22,10 @@ namespace WebApi.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfAlbumServiceAuthorized _albumService;
-        private readonly DtoMapper _dtoMapper;
-        public AlbumController(UserManager<UserEntity> userManager, IPublishService publishService, EfAlbumServiceAuthorized albumService)
+        public AlbumController(UserManager<UserEntity> userManager, EfAlbumServiceAuthorized albumService)
         {
             _userManager = userManager;
             _albumService = albumService;
-            _dtoMapper = new DtoMapper(userManager, publishService);
         }
 
         [HttpPost]
@@ -41,11 +39,11 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            var album = _dtoMapper.Map(inputDto);
+            var album = DtoMapper.Map(inputDto);
             try
             {
                 var created = await _albumService.Create(Guid.Parse(user.Id), album);
-                var output = _dtoMapper.Map(created);
+                var output = DtoMapper.Map(created);
                 return Created(output.Name, output);
             }
             catch (NameDuplicateException e)
@@ -64,11 +62,11 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            var album = _dtoMapper.Map(inputDto);
+            var album = DtoMapper.Map(inputDto);
 
             try
             {
-                return Ok(_dtoMapper.Map(await _albumService.Update(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName,album)));
+                return Ok(DtoMapper.Map(await _albumService.Update(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName,album)));
             }
             catch (AccessViolationException)
             {
@@ -92,7 +90,7 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            return Ok(_dtoMapper.Map(await _albumService.GetAll(Guid.Parse(user.Id))));
+            return Ok(DtoMapper.Map(await _albumService.GetAll(Guid.Parse(user.Id))));
         }
         [HttpGet]
         [Route("GetAllFor/{userLogin}")]
@@ -106,7 +104,7 @@ namespace WebApi.Controllers
             if (targetUser is null)
                 return BadRequest();
         
-            return Ok(_dtoMapper.Map(await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
+            return Ok(DtoMapper.Map(await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
         }
 
         [HttpGet]
@@ -122,7 +120,7 @@ namespace WebApi.Controllers
                 return BadRequest();
             try
             {
-                return Ok(_dtoMapper.Map(await _albumService.GetOne(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), albumName)));
+                return Ok(DtoMapper.Map(await _albumService.GetOne(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), albumName)));
             }
             catch (AccessViolationException)
             {
@@ -144,7 +142,7 @@ namespace WebApi.Controllers
          
             try
             {
-                return Ok(_dtoMapper.Map(await _albumService.Delete(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName)));
+                return Ok(DtoMapper.Map(await _albumService.Delete(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName)));
             }
             catch (AccessViolationException)
             {
@@ -165,7 +163,7 @@ namespace WebApi.Controllers
 
             try
             {
-                return Ok(_dtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(user.Id))));
+                return Ok(DtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(user.Id))));
             }
             catch (AccessViolationException)
             {
@@ -188,7 +186,7 @@ namespace WebApi.Controllers
          
             try
             {
-                return Ok(_dtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
+                return Ok(DtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
             }
             catch (AccessViolationException)
             {

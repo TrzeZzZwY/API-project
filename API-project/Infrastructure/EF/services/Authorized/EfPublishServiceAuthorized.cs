@@ -21,7 +21,22 @@ namespace Infrastructure.EF.Services.Authorized
 
         public async Task<Publish> Create(Guid user,string? albumName, Publish publish)
         {
-            return await _publishService.Create(user, albumName, publish);
+            return await _publishService.Create(user, publish, albumName);
         }
+        public async Task<Publish> GetOne(Guid userId,Guid ownerId,string imageName, string? albumName)
+        {
+            var publish = await _publishService.GetOne(
+                ownerId: ownerId,
+                imageName: imageName,
+                albumName: albumName);
+            return await UserHaveAcces(userId, publish.Id) ? publish : throw new AccessViolationException();
+        }
+        private async Task<bool> UserHaveAcces(Guid userId, Guid publishId)
+        {
+            return !await _publishService.IsPrivate(publishId) ||
+                    await _publishService.IsUserOwner(userId, publishId) ||
+                    await UserIsAdmin(userId);
+        }
+
     }
 }

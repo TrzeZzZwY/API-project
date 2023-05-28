@@ -1,6 +1,5 @@
 ﻿using AppCore.Commons.Exceptions;
 using AppCore.Interfaces.Services;
-using AppCore.Services;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services;
 using Infrastructure.EF.Services.Authorized;
@@ -22,13 +21,11 @@ namespace WebApi.Controllers
     {
         private readonly EfTagServiceAuthorized _tagService;
         private readonly UserManager<UserEntity> _userManager;
-        private readonly DtoMapper _dtoMapper;
 
-        public TagController(EfTagServiceAuthorized tagService, IPublishService publishService, UserManager<UserEntity> userManager)
+        public TagController(EfTagServiceAuthorized tagService, UserManager<UserEntity> userManager)
         {
             _tagService = tagService;
             _userManager = userManager;
-            _dtoMapper = new DtoMapper(userManager, publishService);
         }
         [HttpPost]
         [Route("AddTag")]
@@ -42,11 +39,11 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            var tag = _dtoMapper.Map(input);
+            var tag = DtoMapper.Map(input);
             try
             {
                 var created = await _tagService.Create(Guid.Parse(user.Id), tag);
-                var output = _dtoMapper.Map(created);
+                var output = DtoMapper.Map(created);
                 return Created(output.Name, output);
             }
             catch (NameDuplicateException e)
@@ -65,11 +62,11 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            var tag = _dtoMapper.Map(input);
+            var tag = DtoMapper.Map(input);
             try
             {
                 var updated = await _tagService.Update(Guid.Parse(user.Id), tagName, tag);
-                var output = _dtoMapper.Map(updated);
+                var output = DtoMapper.Map(updated);
                 return Created(output.Name, output);
             }
             catch (AccessViolationException)
@@ -97,7 +94,7 @@ namespace WebApi.Controllers
             try
             {
                 var updated = await _tagService.Delete(Guid.Parse(user.Id), tagName);
-                var output = _dtoMapper.Map(updated);
+                var output = DtoMapper.Map(updated);
                 return Created(output.Name, output);
             }
             catch (AccessViolationException)
@@ -118,7 +115,7 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            return Ok(_dtoMapper.Map(await _tagService.GetAll()));
+            return Ok(DtoMapper.Map(await _tagService.GetAll()));
         }
 
         [HttpGet]
@@ -129,7 +126,7 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            return Ok(_dtoMapper.Map(await _tagService.GetOne(tagName)));
+            return Ok(DtoMapper.Map(await _tagService.GetOne(tagName)));
         }
         [HttpGet]
         [Route("GetPublishesForTag/{tagName}")]
@@ -139,7 +136,7 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            return Ok(_dtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),tagName)));
+            return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),tagName)));
         }
         private async Task<UserEntity?> GetCurrentUser()
         {

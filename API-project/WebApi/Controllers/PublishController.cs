@@ -16,15 +16,13 @@ namespace WebApi.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfPublishServiceAuthorized _publishService;
-        private readonly DtoMapper _dtoMapper;
         private readonly IWebHostEnvironment _hostEnvironment;
-        public PublishController(UserManager<UserEntity> userManager,EfPublishServiceAuthorized publishService, IPublishService pser,
+        public PublishController(UserManager<UserEntity> userManager, EfPublishServiceAuthorized publishService,
             EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _publishService = publishService;
             _hostEnvironment = hostEnvironment;
-            _dtoMapper = new DtoMapper(userManager, pser);
         }
 
         [HttpPost]
@@ -34,27 +32,45 @@ namespace WebApi.Controllers
             var user = await GetCurrentUser();
             if (user is null || input.Image is null)
                 return BadRequest();
+
             string extention = Path.GetExtension(input.Image.FileName);
-            if(!(extention == ".jpg" || extention ==".png"))
+            if (!(extention == ".jpg" || extention == ".png"))
                 return BadRequest("Not allowed file type");
 
-            var publish = _dtoMapper.Map(input);
-            var entity = await _publishService.Create(Guid.Parse(user.Id), input.AlbumName, publish); // TODO zapisywanie jakie ma tagi
+            var entity = await _publishService.Create(
+                Guid.Parse(user.Id),
+                input.AlbumName,
+                DtoMapper.Map(input)); // TODO zapisywanie jakie ma tagi
 
-            SaveImage(user, input,entity.FileName);
+            SaveImage(user, input, entity.FileName);
 
-            var mapped = _dtoMapper.Map(entity);
-            return Created("",mapped);
+            var mapped = DtoMapper.Map(entity);
+            return Created("", mapped);
         }
-        [HttpPost]
-        [Route("GetImgage/{userLogin}/{imageName}/{albumName?}")]
-        public async Task<ActionResult<PublishOutputDto>> GetImg(string userLogin,string imageName, string? albumName = null)
+        [HttpGet]
+        [Route("GetImgage/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> GetImg(string userLogin, string imageName,[FromQuery] string albumName = null)
         {
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
-           
-            return Ok();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                var publish = await _publishService.GetOne(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
+
+                Byte[] b;
+                b = await System.IO.File.ReadAllBytesAsync(
+                    Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", userLogin, publish.FileName + ".jpg"));
+                return File(b,"image/jpeg");
+            }
+            catch (AccessViolationException e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         private async Task<UserEntity?> GetCurrentUser()
@@ -66,7 +82,7 @@ namespace WebApi.Controllers
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
         }
-        private async void SaveImage(UserEntity user, PublishInputDto input,string FileName)
+        private async void SaveImage(UserEntity user, PublishInputDto input, string FileName)
         {
             string dir = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", user.UserName);
             Directory.CreateDirectory(dir);

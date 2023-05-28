@@ -9,17 +9,9 @@ using WebApi.Dto.Output;
 
 namespace WebApi.Dto.Mappers
 {
-    public class DtoMapper
+    public static class DtoMapper
     {
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly IPublishService _publishService;
-        public DtoMapper(UserManager<UserEntity> userManager, IPublishService publishService)
-        {
-            _userManager = userManager;
-            _publishService = publishService;
-        }
-
-        public PublishAlbumOutputDto Map(PublishAlbum p)
+        public static PublishAlbumOutputDto Map(PublishAlbum p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -30,7 +22,7 @@ namespace WebApi.Dto.Mappers
                 publishes: null
                 );
         }
-        public IEnumerable<PublishAlbumOutputDto> Map(IEnumerable<PublishAlbum> p)
+        public static IEnumerable<PublishAlbumOutputDto> Map(IEnumerable<PublishAlbum> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -38,7 +30,7 @@ namespace WebApi.Dto.Mappers
             foreach (var item in p)
                 yield return Map(item);
         }
-        public PublishOutputDto Map(Publish p)
+        public static PublishOutputDto Map(Publish p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -47,7 +39,7 @@ namespace WebApi.Dto.Mappers
                 imageName: p.ImageName,
                 camera: p.Camera,
                 description: p.Description,
-                imgPath: " ",//_publishService.GetImgPath(p.Id).Result,
+                imgPath: "",
                 uploadDate: p.UploadDate,
                 status: p.Status,
                 likes: p.UserPublishLikes is null ? 0 : (uint)p.UserPublishLikes.Count(),
@@ -55,7 +47,7 @@ namespace WebApi.Dto.Mappers
                 comments: p.Comments is null ? null : Map(p.Comments)
                 );
         }
-        public IEnumerable<PublishOutputDto> Map(IEnumerable<Publish> p)
+        public static IEnumerable<PublishOutputDto> Map(IEnumerable<Publish> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -63,34 +55,30 @@ namespace WebApi.Dto.Mappers
             foreach (var publish in p)
                 yield return Map(publish);
         }
-        public CommentOutputDto Map(Comment p)
+        public static CommentOutputDto Map(Comment p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            var user = _userManager.FindByIdAsync(p.Id.ToString()).Result;
-            if (user is null)
-                throw new Exception();
-
             return new CommentOutputDto(
-                userLogin: user.UserName,
+                userLogin: "",
                 commentContent: p.Content
                 );
         }
-        public IEnumerable<CommentOutputDto> Map(IEnumerable<Comment> p)
+        public static IEnumerable<CommentOutputDto> Map(IEnumerable<Comment> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             foreach (var item in p)
                 yield return Map(item);
         }
-        public PublishTagOutputDto Map(PublishTag p)
+        public static PublishTagOutputDto Map(PublishTag p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             return new PublishTagOutputDto(name: p.Name);
         }
-        public IEnumerable<PublishTagOutputDto> Map(IEnumerable<PublishTag> p)
+        public static IEnumerable<PublishTagOutputDto> Map(IEnumerable<PublishTag> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -98,7 +86,7 @@ namespace WebApi.Dto.Mappers
             foreach (var item in p)
                 yield return Map(item);
         }
-        public PublishAlbum Map(PublishAlbumInputDto p)
+        public static PublishAlbum Map(PublishAlbumInputDto p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -110,14 +98,14 @@ namespace WebApi.Dto.Mappers
                 Publishes = null
             };
         }
-        public IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumInputDto> p)
+        public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumInputDto> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             foreach (var item in p)
                 yield return Map(item);
         }
-        public Publish Map(PublishInputDto p)
+        public static Publish Map(PublishInputDto p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -128,43 +116,43 @@ namespace WebApi.Dto.Mappers
                 Description = p.Description,
                 Status = p.Status,
                 UserPublishLikes = null,
-                PublishTags = null, //Map(p.Tags).ToHashSet(),
+                PublishTags = p.Tags is null ? null : Map(p.Tags).ToHashSet(),
                 Comments = null
             };
         }
-        public IEnumerable<Publish> Map(IEnumerable<PublishInputDto> p)
+        public static IEnumerable<Publish> Map(IEnumerable<PublishInputDto> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             foreach (var item in p)
                 yield return Map(item);
         }
-        public Comment Map(CommentInputDto p)
+        public static Comment Map(CommentInputDto p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             return new Comment()
             {
-                Publish = _publishService.GetOne(p.PublishId).Result,
+                Publish = null,
                 Content = p.CommentContent,
                 IsEdited = false
             };
         }
-        public IEnumerable<Comment> Map(IEnumerable<CommentInputDto> p)
+        public static IEnumerable<Comment> Map(IEnumerable<CommentInputDto> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
             foreach (var item in p)
                 yield return Map(item);
         }
-        public PublishTag Map(PublishTagInputDto p)
+        public static PublishTag Map(PublishTagInputDto p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
             return new PublishTag() { Name = p.TagName };
         }
-        public IEnumerable<PublishTag> Map(IEnumerable<PublishTagInputDto> p)
+        public static IEnumerable<PublishTag> Map(IEnumerable<PublishTagInputDto> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");

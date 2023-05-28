@@ -1,6 +1,7 @@
 ﻿using AppCore.Commons.Exceptions;
 using AppCore.Interfaces.Services;
 using AppCore.Models;
+using AppCore.Models.Enums;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
 using Microsoft.AspNetCore.Identity;
@@ -24,24 +25,24 @@ namespace Infrastructure.EF.Services
             _userManager = userManager;
         }
 
-        public async Task<Publish> Create(Guid userId, string? albumName, Publish publish)
+        public async Task<Publish> Create(Guid userId, Publish publish, string? albumName)
         {
             var entity = EntityMapper.Map(publish);
             var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException();
 
             //sprawdzenie czy nazwa jest wolna w danym folderze
-            var duplicate = await _context.Publishes.FirstOrDefaultAsync(e =>e.User.Id == user.Id && e.ImageName == entity.ImageName);
+            var duplicate = await _context.Publishes.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.ImageName == entity.ImageName);
             await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
-            if(duplicate is not null)
-                if((duplicate.Album is null && albumName is null) ||
+            if (duplicate is not null)
+                if ((duplicate.Album is null && albumName is null) ||
                     (duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
                     throw new NameDuplicateException($"name: {entity.ImageName} is already in use in that album");
 
             entity.User = user;
-            if(albumName is not null)
+            if (albumName is not null)
             {
-                var album = await _context.Albums.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.Name == albumName) 
-                    ?? throw new ArgumentException(message:$"Invalid album name {albumName}");
+                var album = await _context.Albums.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.Name == albumName)
+                    ?? throw new ArgumentException(message: $"Invalid album name {albumName}");
                 entity.Album = album;
             }
             entity.FileName = Guid.NewGuid().ToString();
@@ -52,89 +53,187 @@ namespace Infrastructure.EF.Services
             return mapped;
         }
 
-        public Task<Publish> Delete(Guid ownerId, string? albumName, string imageName)
+        public async Task<Publish> Delete(Guid ownerId, string imageName, string? albumName)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(ownerId, imageName, albumName);
+            var removed = EntityMapper.Map(_context.Publishes.Remove(find).Entity);
+            await _context.SaveChangesAsync();
+            return removed;
         }
 
-        public Task<Publish> Delete(Guid publishId)
+        public async Task<Publish> Delete(Guid publishId)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(publishId);
+            var removed = EntityMapper.Map(_context.Publishes.Remove(find).Entity);
+            await _context.SaveChangesAsync();
+            return removed;
         }
 
         public Task<IEnumerable<Publish>> GetAll()
         {
-            throw new NotImplementedException();
+            return Task.FromResult(EntityMapper.Map(_context.Publishes
+                        .Include(e => e.UserLikes)
+                        .Include(e => e.Comments)
+                        .Include(e => e.Album)
+                        .Include(e => e.PublishTags)));
         }
 
         public Task<IEnumerable<Publish>> GetAllFor(Guid ownerId, string? albumName)
         {
-            throw new NotImplementedException();
+            if (albumName is not null)
+                return Task.FromResult(
+                    EntityMapper.Map(
+                        _context.Publishes
+                        .Where(e => e.Album.Name == albumName && e.User.Id == ownerId.ToString())
+                        .Include(e => e.UserLikes)
+                        .Include(e => e.Album)
+                        .Include(e => e.PublishTags)));
+            return Task.FromResult(EntityMapper.Map(_context.Publishes
+                        .Where(e => e.Album == null && e.User.Id == ownerId.ToString())
+                        .Include(e => e.UserLikes)
+                        .Include(e => e.Album)
+                        .Include(e => e.PublishTags)));
         }
 
-        public Task<string> GetImgPath(Guid publishId)
+        public async Task<uint> GetLikes(Guid ownerId, string imageName, string? albumName)
+        {
+            var find = await FindPublish(ownerId, imageName, albumName);
+            return (uint)find.UserLikes.Count;
+        }
+
+        public async Task<uint> GetLikes(Guid publishId)
+        {
+            var find = await FindPublish(publishId);
+            return (uint)find.UserLikes.Count;
+        }
+
+        public async Task<Publish> GetOne(Guid publishId)
+        {
+            return EntityMapper.Map(await FindPublish(publishId));
+        }
+
+        public async Task<Publish> GetOne(Guid albumId, string imageName)
         {
             throw new NotImplementedException();
         }
 
-        public Task<uint> GetLikes(Guid ownerId, string? albumName, string imageName)
+        public async Task<Publish> GetOne(Guid ownerId, string imageName, string? albumName)
         {
-            throw new NotImplementedException();
+            return EntityMapper.Map(await FindPublish(ownerId, imageName, albumName));
         }
 
-        public Task<uint> GetLikes(Guid publishId)
+        public async Task<bool> IsPrivate(Guid ownerId, string imageName, string? albumName)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(ownerId, imageName, albumName);
+            return find.Status == Status.Hidden;
         }
 
-        public Task<Publish> GetOne(Guid publishId)
+        public async Task<bool> IsPrivate(Guid publishId)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(publishId);
+            return find.Status == Status.Hidden;
         }
 
-        public Task<Publish> GetOne(Guid albumId, string imageName)
+        public async Task<bool> IsUserOwner(Guid userId, Guid publishId)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(publishId);
+            return find.User.Id == userId.ToString();
         }
 
-        public Task<Publish> GetOne(Guid ownerId, string? albumName, string imageName)
+        public async Task<uint> Like(Guid ownerId, string imageName, string? albumName, Guid userId)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException("user not found");
+            var find = await FindPublish(ownerId, imageName, albumName);
+            find.UserLikes.Add(user);
+            _context.Update(find);
+            await _context.SaveChangesAsync();
+            return (uint)find.UserLikes.Count;
         }
 
-        public Task<bool> IsPrivate(Guid ownerId, string? albumName, string imageName)
+        public async Task<uint> Like(Guid userId, Guid publishId)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException("user not found");
+            var find = await FindPublish(publishId);
+            find.UserLikes.Add(user);
+            _context.Publishes.Update(find);
+            await _context.SaveChangesAsync();
+            return (uint)find.UserLikes.Count;
         }
 
-        public Task<bool> IsPrivate(Guid publishId)
+        public async Task<bool> Move(string? targetAlbumName, Guid publishId)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(publishId);
+            if ((find.Album is null && targetAlbumName is null) ||
+                (find.Album is not null && targetAlbumName is not null && find.Album.Name == targetAlbumName))
+                return false;
+            if (targetAlbumName is not null)
+            {
+                var album = await _context.Albums.FirstOrDefaultAsync(e => e.Name == targetAlbumName && e.User.Id == find.User.Id)
+                    ?? throw new ArgumentException($"User don't have album named {targetAlbumName}");
+                find.Album = album;
+            }
+            else
+                find.Album = null;
+            _context.Publishes.Update(find);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<bool> IsUserOwner(Guid userId, Guid publishId)
+        public async Task<uint> Unlike(Guid ownerId, string imageName, string? albumName, Guid userId)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException("user not found");
+            var find = await FindPublish(ownerId, imageName, albumName);
+            find.UserLikes.Remove(user);
+            _context.Publishes.Update(find);
+            await _context.SaveChangesAsync();
+            return (uint)find.UserLikes.Count;
         }
 
-        public Task<uint> Like(Guid ownerId, string? albumName, string imageName, Guid userId)
+        public async Task<uint> Unlike(Guid publishId, Guid userId)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new ArgumentException("user not found");
+            var find = await FindPublish(publishId);
+            find.UserLikes.Remove(user);
+            _context.Publishes.Update(find);
+            await _context.SaveChangesAsync();
+            return (uint)find.UserLikes.Count;
         }
 
-        public Task<uint> Like(Guid userId, Guid publishId)
+        public async Task<Publish> Update(Guid publishId, Publish publish)
         {
-            throw new NotImplementedException();
+            var find = await FindPublish(publishId);
+            find.Status = publish.Status;
+            find.ImageName = publish.ImageName;
+            find.Description = publish.Description;
+            find.Camera = publish.Camera;
+            find.PublishTags = EntityMapper.Map(publish.PublishTags).ToHashSet();
+            _context.Publishes.Update(find);
+            _context.SaveChanges();
+            return EntityMapper.Map(find);
         }
-
-        public Task<bool> Move(string? targetAlbumName, Guid publishId)
+        private async Task<PublishEntity> FindPublish(Guid id)
         {
-            throw new NotImplementedException();
+            var find = await _context.Publishes.FindAsync(id) ?? throw new ArgumentException("Publish not found");
+            await _context.Entry(find).Collection(e => e.Comments).LoadAsync();
+            await _context.Entry(find).Collection(e => e.PublishTags).LoadAsync();
+            await _context.Entry(find).Collection(e => e.UserLikes).LoadAsync();
+            await _context.Entry(find).Reference(e => e.Album).LoadAsync();
+            return find;
         }
-
-        public Task<Publish> Update(Guid publishId, Publish publish)
+        private async Task<PublishEntity> FindPublish(Guid ownerId, string imageName, string? albumName = null)
         {
-            throw new NotImplementedException();
+            PublishEntity find;
+            if (albumName is not null)
+                find = await _context.Publishes.FirstOrDefaultAsync(e =>
+                        e.User.Id == ownerId.ToString() &&
+                        e.ImageName == imageName &&
+                        e.Album.Name == albumName) ?? throw new ArgumentException("Publish not found");
+            else
+                find = await _context.Publishes.FirstOrDefaultAsync(e =>
+                        e.User.Id == ownerId.ToString() &&
+                        e.ImageName == imageName &&
+                        e.Album == null) ?? throw new ArgumentException("Publish not found");
+            return await FindPublish(find.Id);
         }
     }
 }
