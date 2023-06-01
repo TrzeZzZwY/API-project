@@ -26,6 +26,11 @@
     <ProjectReference Include="..\AppCore\AppCore.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<Content Update="xunit.runner.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
   <ItemGroup>
     <Folder Include="Uploads\" />
