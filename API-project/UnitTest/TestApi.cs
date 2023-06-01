@@ -1,33 +1,53 @@
-﻿using WebApi.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Infrastructure.EF.Entities;
+using Infrastructure.EF.Services.Authorized;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using WebApi.Controllers;
 using WebApi.Dto.Input;
-using WebApi.Dto.Mappers;
 using WebApi.Dto.Output;
-
-
 namespace UnitTest
 {
-
     public class TestApi
     {
-        private readonly AlbumController _albumController;
+       public readonly AlbumController _albumController;
 
-       public TestApi(AlbumController albumController)
+        public TestApi()
         {
-            _albumController = albumController;
+            var userManagerMock = new Mock<UserManager<UserEntity>>();
+            var albumServiceMock = new Mock<EfAlbumServiceAuthorized>();
+
+            _albumController = new AlbumController(userManagerMock.Object, albumServiceMock.Object);
+            _albumController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "userId")
+                    }))
+                }
+            };
         }
         [Fact]
-        public async void AddAlbum()
+        public async Task AddAlbum()
         {
             // Arrange
-            var albumName = "TestAlbum";
-            var inputDto = new PublishAlbumInputDto { Name = albumName };
+            var inputDto = new PublishAlbumInputDto { Name = "TestAlbum" };
 
             // Act
-            var result = await _albumController.AddAlbum(inputDto);
+            var result = await _albumController.AddAlbum(inputDto) as CreatedResult;
+            var outputDto = result?.Value as PublishAlbumOutputDto;
 
             // Assert
             Assert.NotNull(result);
-            Assert.Same(inputDto, result);
+            Assert.NotNull(outputDto);
+            Assert.Equal(StatusCodes.Status201Created, result.StatusCode);
         }
         [Fact]
         public async void UpateAlbum()
