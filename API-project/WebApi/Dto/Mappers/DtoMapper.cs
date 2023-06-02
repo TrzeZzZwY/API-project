@@ -16,11 +16,13 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new PublishAlbumOutputDto(
-                name: p.Name,
-                status: p.Status,
-                publishes: null
-                );
+            return new PublishAlbumOutputDto()
+            {
+                Name = p.Name,
+                UserName = p.UserName,
+                Status = p.Status,
+                Publishes = p.Publishes is null ? new List<PublishOutputDto>() : Map(p.Publishes).ToHashSet()
+            };
         }
         public static IEnumerable<PublishAlbumOutputDto> Map(IEnumerable<PublishAlbum> p)
         {
@@ -35,17 +37,18 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new PublishOutputDto(
-                imageName: p.ImageName,
-                camera: p.Camera,
-                description: p.Description,
-                imgPath: "",
-                uploadDate: p.UploadDate,
-                status: p.Status,
-                likes: p.UserPublishLikes is null ? 0 : (uint)p.UserPublishLikes.Count(),
-                tags: p.PublishTags is null ? null : Map(p.PublishTags),
-                comments: p.Comments is null ? null : Map(p.Comments)
-                );
+            return new PublishOutputDto()
+            {
+                ImageName = p.ImageName,
+                UserName = p.UserName,
+                Camera = p.Camera,
+                Description = p.Description,
+                UploadDate = p.UploadDate,
+                Status = p.Status,
+                Likes = p.UserPublishLikes is null ? 0 : (uint)p.UserPublishLikes.Count(),
+                Tags = p.PublishTags is null ? new List<PublishTagOutputDto>() : Map(p.PublishTags),
+                Comments = p.Comments is null ? new List<CommentOutputDto>() : Map(p.Comments)
+            };
         }
         public static IEnumerable<PublishOutputDto> Map(IEnumerable<Publish> p)
         {
@@ -60,10 +63,10 @@ namespace WebApi.Dto.Mappers
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
 
-            return new CommentOutputDto(
-                userLogin: "",
-                commentContent: p.Content
-                );
+            return new CommentOutputDto() {
+                UserLogin = "",
+                CommentContent = p.Content
+                };
         }
         public static IEnumerable<CommentOutputDto> Map(IEnumerable<Comment> p)
         {
@@ -76,7 +79,7 @@ namespace WebApi.Dto.Mappers
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
-            return new PublishTagOutputDto(name: p.Name);
+            return new PublishTagOutputDto() { Name = p.Name };
         }
         public static IEnumerable<PublishTagOutputDto> Map(IEnumerable<PublishTag> p)
         {
@@ -95,7 +98,7 @@ namespace WebApi.Dto.Mappers
             {
                 Name = p.Name,
                 Status = p.Status,
-                Publishes = null
+                Publishes = new HashSet<Publish>()
             };
         }
         public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumInputDto> p)
@@ -116,8 +119,8 @@ namespace WebApi.Dto.Mappers
                 Description = p.Description,
                 Status = p.Status,
                 UserPublishLikes = null,
-                PublishTags = p.Tags is null ? null : Map(p.Tags).ToHashSet(),
-                Comments = null
+                PublishTags = p.Tags is null ? new HashSet<PublishTag>() : Map(p.Tags).ToHashSet(),
+                Comments = new HashSet<Comment>()
             };
         }
         public static IEnumerable<Publish> Map(IEnumerable<PublishInputDto> p)
@@ -153,6 +156,26 @@ namespace WebApi.Dto.Mappers
             return new PublishTag() { Name = p.TagName };
         }
         public static IEnumerable<PublishTag> Map(IEnumerable<PublishTagInputDto> p)
+        {
+            if (p is null)
+                throw new ArgumentException(message: "Argument can't be null");
+            foreach (var item in p)
+                yield return Map(item);
+        }
+        public static Publish Map(PublishUpdateInputModel p)
+        {
+            if (p is null)
+                throw new ArgumentException(message: "Argument can't be null");
+            return new Publish()
+            {
+                Camera = p.NewCamera,
+                Description = p.NewDescription,
+                ImageName = p.NewImageName,
+                Status = p.NewStatus,
+                PublishTags = p.NewTags is null? new HashSet<PublishTag>() : Map(p.NewTags).ToHashSet()            
+            };
+        }
+        public static IEnumerable<Publish> Map(IEnumerable<PublishUpdateInputModel> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");

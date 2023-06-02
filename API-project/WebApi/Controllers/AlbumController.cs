@@ -90,7 +90,9 @@ namespace WebApi.Controllers
             if (user is null)
                 return BadRequest();
 
-            return Ok(DtoMapper.Map(await _albumService.GetAll(Guid.Parse(user.Id))));
+            var all = await _albumService.GetAll(Guid.Parse(user.Id));
+            var mapped = DtoMapper.Map(all);
+            return Ok(mapped);
         }
         [HttpGet]
         [Route("GetAllFor/{userLogin}")]

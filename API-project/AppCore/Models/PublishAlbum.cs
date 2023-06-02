@@ -12,6 +12,7 @@ namespace AppCore.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string UserName { get; set; }
         public Status Status { get; set; } = Status.Hidden;
         public ISet<Publish> Publishes { get; set; } = new HashSet<Publish>();
     }

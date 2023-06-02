@@ -4,6 +4,7 @@ using AppCore.Models;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -63,13 +64,14 @@ namespace Infrastructure.EF.Services
         }
         public Task<IEnumerable<PublishAlbum>> GetAll()
         {
-            return Task.FromResult(EntityMapper.Map(_context.Albums));
+            var all = _context.Albums.Include(e => e.Publishes).Include(e => e.User);
+            return Task.FromResult(EntityMapper.Map(all));
         }
         public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid ownerId)
         {
             return Task.FromResult(
                 EntityMapper.Map(
-                    _context.Albums.Where(e => e.User.Id == ownerId.ToString())
+                    _context.Albums.Where(e => e.User.Id == ownerId.ToString()).Include(e => e.Publishes).Include(e => e.User)
                     ));
         }
         public async Task<PublishAlbum> GetOne(Guid publishAlbumId)
@@ -124,20 +126,21 @@ namespace Infrastructure.EF.Services
         {
             var album = await _context.Albums.FindAsync(albumId);
             await _context.Entry(album).Reference(e => e.User).LoadAsync();
+            await _context.Entry(album).Collection(e => e.Publishes).LoadAsync();
             if (album is null)
                 throw new ArgumentException("Invalid album");
             return album;
         }
-        private Task<PublishAlbumEntity> GetAlbumAsync(Guid ownerId, string albumName)
+        private async Task<PublishAlbumEntity> GetAlbumAsync(Guid ownerId, string albumName)
         {
             var album = _context.Albums.FirstOrDefault(e => e.User.Id == ownerId.ToString() && e.Name == albumName);
             if (album is null)
                 throw new ArgumentException("Invalid album");
-            return Task.FromResult(album);
+            return await GetAlbumAsync(album.Id);
         }
         private async Task<IEnumerable<PublishAlbumEntity>> GetAllAlbums(Guid ownerId)
         {
-            return _context.Albums.Where(e => e.User.Id == ownerId.ToString());
+            return _context.Albums.Where(e => e.User.Id == ownerId.ToString()).Include(e => e.Publishes).Include(e => e.User);
         } 
     }
 }

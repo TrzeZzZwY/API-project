@@ -32,21 +32,27 @@ namespace Infrastructure.EF.Services
 
             //sprawdzenie czy nazwa jest wolna w danym folderze
             var duplicate = await _context.Publishes.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.ImageName == entity.ImageName);
-            await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
             if (duplicate is not null)
+            {
+                await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
                 if ((duplicate.Album is null && albumName is null) ||
                     (duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
                     throw new NameDuplicateException($"name: {entity.ImageName} is already in use in that album");
-
-            entity.User = user;
+            }
+            entity.User = user;           
             if (albumName is not null)
             {
                 var album = await _context.Albums.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.Name == albumName)
                     ?? throw new ArgumentException(message: $"Invalid album name {albumName}");
                 entity.Album = album;
             }
+            HashSet<PublishTagEntity> tags = new HashSet<PublishTagEntity>();
+            foreach (var item in publish.PublishTags)
+            {
+                tags = _context.Tags.Where(e => publish.PublishTags.Any(x => x.Name == e.Name)).ToHashSet();
+            }
+            entity.PublishTags = tags;
             entity.FileName = Guid.NewGuid().ToString();
-
             var saved = await _context.Publishes.AddAsync(entity);
             await _context.SaveChangesAsync();
             var mapped = EntityMapper.Map(saved.Entity);
@@ -67,6 +73,15 @@ namespace Infrastructure.EF.Services
             var removed = EntityMapper.Map(_context.Publishes.Remove(find).Entity);
             await _context.SaveChangesAsync();
             return removed;
+        }
+
+        public async Task<IEnumerable<Publish>> DeleteAll(Guid ownerId, string? albumName)
+        {
+            var all = findAll(ownerId, albumName);
+            var copy = all.ToList();
+            _context.Publishes.RemoveRange(all);
+            await _context.SaveChangesAsync();
+            return EntityMapper.Map(copy);
         }
 
         public Task<IEnumerable<Publish>> GetAll()
@@ -166,14 +181,24 @@ namespace Infrastructure.EF.Services
             if ((find.Album is null && targetAlbumName is null) ||
                 (find.Album is not null && targetAlbumName is not null && find.Album.Name == targetAlbumName))
                 return false;
+            PublishAlbumEntity album;
+            bool duplucate = false;
             if (targetAlbumName is not null)
             {
-                var album = await _context.Albums.FirstOrDefaultAsync(e => e.Name == targetAlbumName && e.User.Id == find.User.Id)
+                 album = await _context.Albums.FirstOrDefaultAsync(e => e.Name == targetAlbumName && e.User.Id == find.User.Id)
                     ?? throw new ArgumentException($"User don't have album named {targetAlbumName}");
-                find.Album = album;
+                await _context.Entry(album).Collection(e => e.Publishes).LoadAsync();
+                if(album.Publishes.Any(e => e.ImageName == find.ImageName))
+                    throw new ArgumentException($"album {album.Name} already contrains publish named {find.ImageName}");
             }
             else
-                find.Album = null;
+            {
+                album = null;
+                if(_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == null && e.ImageName == find.ImageName))
+                    throw new ArgumentException($"primary album already contrains publish named {find.ImageName}");
+            }
+
+            find.Album = album;
             _context.Publishes.Update(find);
             await _context.SaveChangesAsync();
             return true;
@@ -202,6 +227,8 @@ namespace Infrastructure.EF.Services
         public async Task<Publish> Update(Guid publishId, Publish publish)
         {
             var find = await FindPublish(publishId);
+            if (_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == find.Album && e.ImageName == publish.ImageName))
+                throw new ArgumentException($"name {publish.ImageName} is already takien in that folder");
             find.Status = publish.Status;
             find.ImageName = publish.ImageName;
             find.Description = publish.Description;
@@ -217,6 +244,7 @@ namespace Infrastructure.EF.Services
             await _context.Entry(find).Collection(e => e.Comments).LoadAsync();
             await _context.Entry(find).Collection(e => e.PublishTags).LoadAsync();
             await _context.Entry(find).Collection(e => e.UserLikes).LoadAsync();
+            await _context.Entry(find).Reference(e => e.User).LoadAsync();
             await _context.Entry(find).Reference(e => e.Album).LoadAsync();
             return find;
         }
@@ -227,13 +255,30 @@ namespace Infrastructure.EF.Services
                 find = await _context.Publishes.FirstOrDefaultAsync(e =>
                         e.User.Id == ownerId.ToString() &&
                         e.ImageName == imageName &&
-                        e.Album.Name == albumName) ?? throw new ArgumentException("Publish not found");
+                        e.Album.Name == albumName);
             else
                 find = await _context.Publishes.FirstOrDefaultAsync(e =>
                         e.User.Id == ownerId.ToString() &&
                         e.ImageName == imageName &&
-                        e.Album == null) ?? throw new ArgumentException("Publish not found");
+                        e.Album == null);
+            if (find is null)
+                throw new Exception("Publish not found");
             return await FindPublish(find.Id);
+        }
+        private IEnumerable<PublishEntity> findAll(Guid ownerId, string? albumName)
+        {
+            List<PublishEntity> find = new List<PublishEntity>();
+            if (albumName is not null)
+                find =  _context.Publishes.Where(e =>
+                        e.User.Id == ownerId.ToString() &&
+                        e.Album.Name == albumName).ToList();
+            else
+                find =  _context.Publishes.Where(e =>
+                        e.User.Id == ownerId.ToString() &&
+                        e.Album == null).ToList();
+            if (find is null)
+                throw new Exception("Publish not found");
+            return find;
         }
     }
 }

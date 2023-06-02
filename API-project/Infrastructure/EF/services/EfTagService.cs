@@ -8,6 +8,7 @@ using AppCore.Interfaces.Services;
 using AppCore.Models;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.EF.Services
 {
@@ -26,7 +27,7 @@ namespace Infrastructure.EF.Services
                 throw new NameDuplicateException($"name: {tag.Name} is already in use");
             var entity = EntityMapper.Map(tag);
             var added = await _context.Tags.AddAsync(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             var mapped = EntityMapper.Map(added.Entity);
             return mapped;
         }
@@ -43,25 +44,24 @@ namespace Infrastructure.EF.Services
 
         public async Task<PublishTag> Delete(string tagName)
         {
-            var tag = FindTag(tagName);
+            var tag = await FindTag(tagName);
             return await Delete(tag.Id);
         }
 
         public Task<IEnumerable<PublishTag>> GetAll()
         {
-            return Task.FromResult(EntityMapper.Map(_context.Tags));
+            return Task.FromResult(EntityMapper.Map(_context.Tags.Include(e => e.Publishes)));
         }
 
         public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid tagId)
         {
             var tag = await FindTag(tagId);
-            await _context.Entry(tag).Collection(e => e.Publishes).LoadAsync();
             return EntityMapper.Map(tag.Publishes);
         }
 
         public async Task<IEnumerable<Publish>> GetAllPublishesForTag(string tagName)
         {
-            var tag = FindTag(tagName);
+            var tag = await FindTag(tagName);
             return await GetAllPublishesForTag(tag.Id);
         }
 
@@ -73,7 +73,7 @@ namespace Infrastructure.EF.Services
 
         public async Task<PublishTag> GetOne(string tagName)
         {
-            var tag = FindTag(tagName);
+            var tag = await FindTag(tagName);
             return await GetOne(tag.Id);
         }
 
@@ -92,7 +92,7 @@ namespace Infrastructure.EF.Services
 
         public async Task<PublishTag> Update(string tagName, PublishTag tag)
         {
-            var find = FindTag(tagName);
+            var find = await FindTag(tagName);
             return await Update(find.Id, tag);
         }
 
@@ -103,11 +103,12 @@ namespace Infrastructure.EF.Services
                 throw new ArgumentException();
             return tag;
         }
-        private PublishTagEntity FindTag(string tagName)
+        private async Task<PublishTagEntity> FindTag(string tagName)
         {
             var tag = _context.Tags.FirstOrDefault(e => e.Name == tagName);
             if (tag is null)
                 throw new ArgumentException();
+            await _context.Entry(tag).Collection(e => e.Publishes).LoadAsync();
             return tag;
         }
     }

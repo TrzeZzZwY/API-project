@@ -17,6 +17,8 @@ namespace AppCore.Models
         public Guid Id { get; set; }
         public string ImageName { get; set; }
         public string FileName { get; set; }
+        public string UserName { get; set; }
+        
         public Cameras Camera { get; set; } = Cameras.None;
         public string? Description { get; set; }
         public DateTime UploadDate { get; set; }

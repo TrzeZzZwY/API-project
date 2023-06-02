@@ -1,7 +1,5 @@
 ﻿using AppCore.Models;
 using Infrastructure.EF.Entities;
-using Infrastructure.EF.Services;
-using Infrastructure.EF.Services;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -22,7 +20,7 @@ namespace Infrastructure.EF.Mappers
 
             return new CommentEntity()
             {
-                publish = Map(p.Publish),
+                publish = p.Publish is null ? null : Map(p.Publish),
                 CommentContent = p.Content,
                 IsEdited = p.IsEdited
             };
@@ -103,7 +101,7 @@ namespace Infrastructure.EF.Mappers
                 Id = p.Id,
                 Content = p.CommentContent,
                 IsEdited = p.IsEdited,
-                Publish = null
+                Publish = p.publish is null ? null : Map(p.publish)
             };
         }
         public static IEnumerable<Comment> Map(IEnumerable<CommentEntity> p)
@@ -122,14 +120,15 @@ namespace Infrastructure.EF.Mappers
             {
                 Id = p.Id,
                 ImageName = p.ImageName,
+                FileName = p.FileName,
+                UserName = p.User.UserName is null ? "" : p.User.UserName,
                 Camera = p.Camera,
                 Description = p.Description,
                 UploadDate = p.UploadDate,
                 Status = p.Status,
-                FileName = p.FileName,
-                UserPublishLikes = p.UserLikes is null ? null : p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
-                PublishTags = p.PublishTags is null ? null : Map(p.PublishTags).ToHashSet(),
-                Comments = p.Comments is null ? null : Map(p.Comments).ToHashSet()
+                UserPublishLikes = p.UserLikes is null ? new HashSet<Guid>() : p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
+                PublishTags = p.PublishTags is null ? new HashSet<PublishTag>() : Map(p.PublishTags).ToHashSet(),
+                Comments = p.Comments is null ? new HashSet<Comment>() : Map(p.Comments).ToHashSet()
             };
         }
         public static IEnumerable<Publish> Map(IEnumerable<PublishEntity> p)
@@ -162,11 +161,13 @@ namespace Infrastructure.EF.Mappers
             if (p is null)
                 throw new ArgumentException("Argument can't be null!");
 
-            return new PublishAlbum() {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Status = p.Status,
-                    Publishes = null
+            return new PublishAlbum()
+            {
+                Id = p.Id,
+                Name = p.Name,
+                UserName = p.User.UserName is null ? "" : p.User.UserName,
+                Status = p.Status,
+                Publishes = p.Publishes is null ? new HashSet<Publish>() : Map(p.Publishes).ToHashSet()
             };
         }
         public static IEnumerable<PublishAlbum> Map(IEnumerable<PublishAlbumEntity> p)

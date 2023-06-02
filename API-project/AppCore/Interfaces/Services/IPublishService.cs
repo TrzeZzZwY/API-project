@@ -19,6 +19,7 @@ namespace AppCore.Interfaces.Services
         public Task<Publish> Create(Guid userID, Publish publish, string? albumName);
         public Task<Publish> Delete(Guid ownerId, string imageName, string? albumName);
         public Task<Publish> Delete(Guid publishId);
+        public Task<IEnumerable<Publish>> DeleteAll(Guid ownerId,string? albumName);
         public Task<Publish> Update(Guid publishId, Publish publish);
         public Task<bool> Move(string? targetAlbumName, Guid publishId);
         public Task<bool> IsUserOwner(Guid userId, Guid publishId);
@@ -27,7 +28,7 @@ namespace AppCore.Interfaces.Services
         public Task<uint> GetLikes(Guid ownerId, string imageName, string? albumName);
         public Task<uint> GetLikes(Guid publishId);
         public Task<uint> Like(Guid ownerId, string imageName, string? albumName, Guid userId);
-        public Task<uint> Like(Guid publishId, Guid userId);
+        public Task<uint> Like(Guid userId, Guid publishId);
         public Task<uint> Unlike(Guid ownerId, string imageName, string? albumName, Guid userId);
         public Task<uint> Unlike(Guid publishId, Guid userId);
     }

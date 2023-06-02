@@ -26,7 +26,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("SavePost")]
+        [Route("CreatePost")]
         public async Task<ActionResult<PublishOutputDto>> SavePublish(PublishInputDto input)
         {
             var user = await GetCurrentUser();
@@ -36,20 +36,87 @@ namespace WebApi.Controllers
             string extention = Path.GetExtension(input.Image.FileName);
             if (!(extention == ".jpg" || extention == ".png"))
                 return BadRequest("Not allowed file type");
+            try
+            {
+                var entity = await _publishService.Create(
+                    Guid.Parse(user.Id),
+                    input.AlbumName,
+                    DtoMapper.Map(input));
 
-            var entity = await _publishService.Create(
-                Guid.Parse(user.Id),
-                input.AlbumName,
-                DtoMapper.Map(input)); // TODO zapisywanie jakie ma tagi
+                SaveImage(user, input, entity.FileName);
 
-            SaveImage(user, input, entity.FileName);
+                var mapped = DtoMapper.Map(entity);
+                return Created("", mapped);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
 
-            var mapped = DtoMapper.Map(entity);
-            return Created("", mapped);
+        }
+        [HttpPatch]
+        [Route("UpdatPost/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> Update(PublishUpdateInputModel input, string userLogin, string imageName, [FromQuery] string? albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            try
+            {
+                var entity = await _publishService.Update(Guid.Parse(user.Id),Guid.Parse(target.Id),imageName,albumName,DtoMapper.Map(input));
+                var mapped = DtoMapper.Map(entity);
+                return Ok(mapped);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
         [HttpGet]
-        [Route("GetImgage/{userLogin}/{imageName}")]
-        public async Task<ActionResult<PublishOutputDto>> GetImg(string userLogin, string imageName,[FromQuery] string albumName = null)
+        [Route("GetAllPostsFor/{userLogin}")]
+        public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes(string userLogin, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                var publish = await _publishService.GetAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName);
+                return Ok(DtoMapper.Map(publish));
+            }
+            catch (AccessViolationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("GetPost/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> GetImageDetails(string userLogin, string imageName, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                var publish = await _publishService.GetOne(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
+                return Ok(DtoMapper.Map(publish));
+            }
+            catch (AccessViolationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("GetPostImage/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> GetImage(string userLogin, string imageName, [FromQuery] string albumName)
         {
             var user = await GetCurrentUser();
             if (user is null)
@@ -62,17 +129,123 @@ namespace WebApi.Controllers
                 var publish = await _publishService.GetOne(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
 
                 Byte[] b;
-                b = await System.IO.File.ReadAllBytesAsync(
-                    Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", userLogin, publish.FileName + ".jpg"));
-                return File(b,"image/jpeg");
+                try
+                {
+                    b = await System.IO.File.ReadAllBytesAsync(
+                        Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", userLogin, publish.FileName + ".jpg"));
+                    return File(b, "image/jpeg");
+                }
+                catch
+                {
+                    b = await System.IO.File.ReadAllBytesAsync(
+                        Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", userLogin, publish.FileName + ".png"));
+                    return File(b, "image/png");
+                }
+
             }
-            catch (AccessViolationException e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
 
         }
+        [HttpGet]
+        [Route("Like/{userLogin}/{imageName}")]
+        public async Task<ActionResult<uint>> Like(string userLogin, string imageName, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
 
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                return Ok(await _publishService.Like(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("Unlike/{userLogin}/{imageName}")]
+        public async Task<ActionResult<uint>> Unlike(string userLogin, string imageName, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                return Ok(await _publishService.UnLike(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("MovePostTo/{userLogin}/{imageName}")]
+        public async Task<ActionResult<bool>> Move(string userLogin, string imageName, [FromQuery] string oldAlbumName, [FromQuery] string newAlbumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                return Ok(await _publishService.Move(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, oldAlbumName, newAlbumName));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpDelete]
+        [Route("Delete/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> Delete(string userLogin, string imageName, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                await _publishService.Delete(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpDelete]
+        [Route("DeleteAll/{userLogin}")]
+        public async Task<ActionResult<IEnumerable<PublishOutputDto>>> Delete(string userLogin, [FromQuery] string albumName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+
+            try
+            {
+                await _publishService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         private async Task<UserEntity?> GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
