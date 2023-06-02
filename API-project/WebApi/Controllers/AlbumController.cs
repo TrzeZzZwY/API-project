@@ -61,7 +61,7 @@ namespace WebApi.Controllers
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
-
+                
             var album = DtoMapper.Map(inputDto);
 
             try
@@ -213,7 +213,7 @@ namespace WebApi.Controllers
             return Ok("Other Role");
         }
 
-        private async Task<UserEntity?> GetCurrentUser()
+        public  async Task<UserEntity?> GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity is null)

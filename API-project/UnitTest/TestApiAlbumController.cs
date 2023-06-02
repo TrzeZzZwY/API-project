@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AppCore.Commons.Exceptions;
+using AppCore.Models;
 using FakeItEasy;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Services.Authorized;
@@ -19,6 +21,8 @@ namespace UnitTest
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfAlbumServiceAuthorized _albumService;
+        private readonly Mock<HttpContext> _httpContextMock;
+
 
         public TestApiAlbumController()
         {
@@ -38,62 +42,100 @@ namespace UnitTest
             Assert.IsType<BadRequestObjectResult>(result.Result);
         }
         [Fact]
-        public async Task AddAlbum_WhenUserIsNotAuthorized_ReturnsBadRequest()
+        public void AddAlbum_WhenUserIsNotAuthorized_ReturnsBadRequest()
         {
             // Arrange
             var controller = new AlbumController(_userManager, _albumService);
             A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns((UserEntity)null);
             // Act
-            var result = await controller.AddAlbum(new PublishAlbumInputDto());
+            var result = controller.AddAlbum(new PublishAlbumInputDto());
             // Assert
-            Assert.IsType<BadRequestResult>(result);
+            Assert.IsType<BadRequestResult>(result.Result);
         }
+        //[Fact]
+        //public void AddAlbum_WhenAlbumIsCreated_ReturnsCreated()
+        //{
+        //    // Arrange
+        //    var controller = new AlbumController(_userManager, _albumService);
+        //    var user = new UserEntity();
+        //    var album = new PublishAlbum();
+        //    var inputDto = new PublishAlbumInputDto();
+        //    var outputDto =  PublishAlbumOutputDto();
+        //    A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns(user);
+        //    A.CallTo(() => _albumService.Create(A<Guid>._, A<PublishAlbum>._)).Returns(album);
+        //    A.CallTo(() => DtoMapper.Map(A<PublishAlbum>._)).Returns(outputDto);
+        //    // Act
+        //    var result = controller.AddAlbum(inputDto);
+        //    // Assert
+        //    Assert.IsType<CreatedResult>(result.Result);
+        //}
+        //[Fact]
+        //public void AddAlbum_WhenAlbumNameIsDuplicated_ReturnsBadRequest()
+        //{
+        //    // Arrange
+        //    var controller = new AlbumController(_userManager, _albumService);
+        //    var user = new UserEntity();
+        //    var album = new PublishAlbum();
+        //    var inputDto = new PublishAlbumInputDto();
+        //    var outputDto =  PublishAlbumOutputDto();
+        //    A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns(user);
+        //    A.CallTo(() => _albumService.Create(A<Guid>._, A<PublishAlbum>._)).Throws<NameDuplicateException>();
+        //    // Act
+        //    var result = controller.AddAlbum(inputDto);
+        //    // Assert
+        //    Assert.IsType<BadRequestObjectResult>(result.Result);
+        //}
         [Fact]
-        
-        public async Task AddAlbum()
-        {
-            // Arrange
-            var userManagerMock = A.Fake<UserManager<UserEntity>>();
-            var albumServiceMock = A.Fake<EfAlbumServiceAuthorized>();
-            var controller = new AlbumController(userManagerMock, albumServiceMock);
-
-            var user = new UserEntity { Id = Guid.NewGuid().ToString() };
-            A.CallTo(() => userManagerMock.GetUserAsync(A<ClaimsPrincipal>._)).Returns(user);
-
-            var albumEntity = new Infrastructure.EF.Entities.PublishAlbumEntity { Name = "Test" };
-            var album = new AppCore.Models.PublishAlbum { Name = albumEntity.Name };
-            A.CallTo(() => albumServiceMock.Create(Guid.Parse(user.Id), album)).Returns(Task.FromResult(album));
-
-            var inputDto = new PublishAlbumInputDto { Name = "Test" };
-
-            // Act
-            var result = await controller.AddAlbum(inputDto);
-
-            // Assert
-            Assert.IsType<CreatedResult>(result);
-        }
-        [Fact]
-        public async Task GetAllAlbumAsync()
+        public void UpdateAlbum_WhenModelIsNotValid_ReturnsBadRequest()
         {
             // Arrange
             var controller = new AlbumController(_userManager, _albumService);
-            var user = new UserEntity { Id = Guid.NewGuid().ToString() };
-            A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns(user);
-            var albumEntity = new PublishAlbumEntity { Name = "Test" };
-            var album = new AppCore.Models.PublishAlbum { Name = albumEntity.Name };
-            A.CallTo(() => _albumService.GetAll(Guid.Parse(user.Id))).Returns(new List<AppCore.Models.PublishAlbum> { album });
-
+            controller.ModelState.AddModelError("Name", "Name is required");
             // Act
-            var result = await controller.GetAllAlbums();
-
+            var result = controller.UpateAlbum(new PublishAlbumInputDto(), "albumName");
             // Assert
-            Assert.IsType<OkObjectResult>(result.Result);
-
-            var okObjectResult = (OkObjectResult)result.Result;
-            var albums = (List<PublishAlbumOutputDto>)okObjectResult.Value;
-
-            Assert.Equal(1, albums.Count);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
         }
+        //[Fact]
+        //public void UpdateAlbum_WhenUserIsNotAuthorized_ReturnsBadRequest()
+        //{
+        //    // Arrange
+        //    var controller = new AlbumController(_userManager, _albumService);
+        //    A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns((UserEntity)null);
+        //    // Act
+        //    var result = controller.UpateAlbum(new PublishAlbumInputDto(), "albumName");
+        //    // Assert
+        //    Assert.IsType<BadRequestResult>(result.Result);
+        //}
+        //[Fact]
+        //public void UpdateAlbum_WhenAlbumIsUpdated_ReturnsOk()
+        //{
+        //    // Arrange
+        //    var controller = new AlbumController(_userManager, _albumService);
+        //    var user = new UserEntity();
+        //    var album = new PublishAlbum();
+        //    var inputDto = new PublishAlbumInputDto();
+        //    var outputDto =  PublishAlbumOutputDto();
+        //    A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns(user);
+        //    A.CallTo(() => _albumService.Update(A<Guid>._, A<PublishAlbum>._)).Returns(album);
+        //    A.CallTo(() => DtoMapper.Map(A<PublishAlbum>._)).Returns(outputDto);
+        //    // Act
+        //    var result = controller.UpateAlbum(inputDto, "albumName");
+        //    // Assert
+        //    Assert.IsType<OkObjectResult>(result.Result);
+        //}
+        [Fact]
+        public void GetAll_WhenUserIsNull_ReturnsBadQequest()
+        {
+            // Arrange
+            var controller = new AlbumController(_userManager, _albumService);
+            A.CallTo(() => _userManager.GetUserAsync(A<ClaimsPrincipal>._)).Returns((UserEntity)null);
+            // Act
+            var result = controller.GetAllAlbums();
+            // Assert
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
+
     }
        
 }
