@@ -5,6 +5,7 @@ using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AppCore.Models.Enums;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -62,17 +63,31 @@ namespace Infrastructure.EF.Services
             await _context.SaveChangesAsync();
             return EntityMapper.Map(a);
         }
-        public Task<IEnumerable<PublishAlbum>> GetAll()
+        public Task<IEnumerable<PublishAlbum>> GetAll(Guid userId, int page, int take)
         {
-            var all = _context.Albums.Include(e => e.Publishes).Include(e => e.User);
-            return Task.FromResult(EntityMapper.Map(all));
+            var query = _context.Albums.Include(e => e.Publishes).Include(e => e.User);
+            var acces = query.Where(e =>
+                (e.Status == Status.Visible) ||
+                (e.User.Id == userId.ToString()) ||
+                (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result)
+            );
+            var albums = QueryFilter.Paginate(acces, page, take).ToList();
+            return Task.FromResult(EntityMapper.Map(albums));
         }
-        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid ownerId)
+        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId, int page, int take)
         {
-            return Task.FromResult(
-                EntityMapper.Map(
-                    _context.Albums.Where(e => e.User.Id == ownerId.ToString()).Include(e => e.Publishes).Include(e => e.User)
-                    ));
+            var query = _context.Albums
+                .Where(e => e.User.Id == ownerId.ToString()) //Dostęp
+                .Include(e => e.Publishes)
+                .Include(e => e.User);
+
+            var acces = query.Where(e =>     
+                (e.Status == Status.Visible) ||
+                (e.User.Id == userId.ToString()) ||
+                (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result)
+            );
+            var albums = QueryFilter.Paginate(acces, page, take).ToList();
+            return Task.FromResult(EntityMapper.Map(albums));
         }
         public async Task<PublishAlbum> GetOne(Guid publishAlbumId)
         {

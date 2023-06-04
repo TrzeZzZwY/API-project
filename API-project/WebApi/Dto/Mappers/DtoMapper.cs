@@ -119,7 +119,7 @@ namespace WebApi.Dto.Mappers
                 Description = p.Description,
                 Status = p.Status,
                 UserPublishLikes = null,
-                PublishTags = p.Tags is null ? new HashSet<PublishTag>() : Map(p.Tags).ToHashSet(),
+                PublishTags = p.Tags is null ? new HashSet<PublishTag>() : Map(p.Tags.Select(e => new PublishTagInputDto() { TagName = e})).ToHashSet(),
                 Comments = new HashSet<Comment>()
             };
         }

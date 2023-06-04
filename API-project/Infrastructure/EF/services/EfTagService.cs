@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using AppCore.Commons.Exceptions;
 using AppCore.Interfaces.Services;
 using AppCore.Models;
+using AppCore.Models.Enums;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.EF.Services
@@ -15,10 +17,12 @@ namespace Infrastructure.EF.Services
     public class EfTagService : ITagService
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public EfTagService(AppDbContext context)
+        public EfTagService(AppDbContext context, UserManager<UserEntity> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<PublishTag> Create(PublishTag tag)
@@ -48,21 +52,33 @@ namespace Infrastructure.EF.Services
             return await Delete(tag.Id);
         }
 
-        public Task<IEnumerable<PublishTag>> GetAll()
+        public async Task<IEnumerable<PublishTag>> GetAll(Guid userId, int page, int take)
         {
-            return Task.FromResult(EntityMapper.Map(_context.Tags.Include(e => e.Publishes)));
+            var query = _context.Tags.Include(e => e.Publishes);
+            var tags = await QueryFilter.Paginate(query, page, take).ToListAsync();
+            return EntityMapper.Map(tags);
         }
 
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid tagId)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, Guid tagId, int page, int take)
         {
             var tag = await FindTag(tagId);
-            return EntityMapper.Map(tag.Publishes);
+            var query = _context.Publishes.Where(e => e.PublishTags.Contains(tag))
+                    .Include(e => e.UserLikes)
+                    .Include(e => e.Comments)
+                    .Include(e => e.Album)
+                    .Include(e => e.PublishTags);
+            var acces = query.Where(e =>
+                    (e.Status == Status.Visible) ||
+                    (e.User.Id == userId.ToString()) ||
+                    (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            var tags = await QueryFilter.Paginate(acces, page, take).ToListAsync();
+            return EntityMapper.Map(tags);
         }
 
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(string tagName)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, string tagName, int page, int take)
         {
             var tag = await FindTag(tagName);
-            return await GetAllPublishesForTag(tag.Id);
+            return await GetAllPublishesForTag(userId, tag.Id, page, take);
         }
 
         public async Task<PublishTag> GetOne(Guid tagId)

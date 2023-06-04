@@ -9,8 +9,8 @@ namespace AppCore.Interfaces.Services
 {
     public interface IAlbumService
     {
-        public Task<IEnumerable<PublishAlbum>> GetAll();
-        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid ownerId);
+        public Task<IEnumerable<PublishAlbum>> GetAll(Guid userId, int page, int take);
+        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId, int page, int take);
 
         public Task<PublishAlbum> GetOne(Guid publishAlbumId);
         public Task<PublishAlbum> GetOne(Guid ownerId, string albumName);

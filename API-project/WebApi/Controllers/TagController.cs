@@ -30,7 +30,7 @@ namespace WebApi.Controllers
         [HttpPost]
         [Route("AddTag")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddTag(PublishTagInputDto input)
+        public async Task<IActionResult> AddTag([FromBody]PublishTagInputDto input)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -109,13 +109,13 @@ namespace WebApi.Controllers
 
         [HttpGet]
         [Route("GetAllTags")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
 
-            return Ok(DtoMapper.Map(await _tagService.GetAll()));
+            return Ok(DtoMapper.Map(await _tagService.GetAll(Guid.Parse(user.Id),(int)page,(int)take)));
         }
 
         [HttpGet]
@@ -130,13 +130,13 @@ namespace WebApi.Controllers
         }
         [HttpGet]
         [Route("GetPublishesForTag/{tagName}")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAllPublishesForTag([FromRoute] string tagName)
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAllPublishesForTag([FromRoute] string tagName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
 
-            return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),tagName)));
+            return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),tagName,(int)page,(int)take)));
         }
         private async Task<UserEntity?> GetCurrentUser()
         {

@@ -35,17 +35,17 @@ namespace Infrastructure.EF.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Comment>> GetAll()
+        public Task<IEnumerable<Comment>> GetAll(Guid userId, int page, int take)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Comment>> GetAllForComment(Guid commentId)
+        public Task<IEnumerable<Comment>> GetAllForComment(Guid userId, Guid commentId, int page, int take)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Comment>> GetAllForPublish(Guid publishId)
+        public Task<IEnumerable<Comment>> GetAllForPublish(Guid userId, Guid publishId, int page, int take)
         {
             throw new NotImplementedException();
         }

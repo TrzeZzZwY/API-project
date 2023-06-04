@@ -49,17 +49,19 @@ namespace Infrastructure.EF.Services.Authorized
                 albumName: albumName);
             return await UserHaveAcces(userId, publish.Id) ? publish : throw new AccessViolationException();
         }
-        public async Task<IEnumerable<Publish>> GetAll(Guid userId)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
         {
-            var all = await _publishService.GetAll();
-            return all.Where(
-                e => UserHaveAcces(userId, e.Id).Result).ToList();
+            var all = await _publishService.GetAll(userId,page,take);
+            //return all.Where(
+            //    e => UserHaveAcces(userId, e.Id).Result).ToList();
+            return all;
         }
-        public async Task<IEnumerable<Publish>> GetAll(Guid userId,Guid ownerId, string? albumName)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId,Guid ownerId, string? albumName, int page, int take)
         {
-            var all = await _publishService.GetAllFor(ownerId,albumName);
-            return all.Where(
-                e => UserHaveAcces(userId, e.Id).Result).ToList();
+            var all = await _publishService.GetAllFor(userId,ownerId,albumName,page,take);
+            //return all.Where(
+            //    e => UserHaveAcces(userId, e.Id).Result).ToList();
+            return all;
         }
         public async Task<Publish> Update(Guid userId, Guid albumId, Publish publish)
         {

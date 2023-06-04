@@ -96,7 +96,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-    //options.SchemaFilter<EnumSchemaFilter>();   
+    options.SchemaFilter<EnumSchemaFilter>();   
     });
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

@@ -43,17 +43,20 @@ namespace Infrastructure.EF.Services.Authorized
                 return await _albumService.DeleteAll(ownerId);
             throw new AccessViolationException();
         }
-        public async Task<IEnumerable<PublishAlbum>> GetAll(Guid userId)
+        public async Task<IEnumerable<PublishAlbum>> GetAll(Guid userId,int page, int take)
         {
-            var all = await _albumService.GetAll();
-            return all.Where(
-                e => UserHaveAcces(userId, e.Id).Result).ToList();
+            var all = await _albumService.GetAll(userId,page,take);
+            //return all.Where(
+            //    e => UserHaveAcces(userId, e.Id).Result).ToList();
+            return all;
         }
-        public async Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId)
+        public async Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId, int page, int take)
         {
-            var all = await _albumService.GetAllFor(ownerId);
-            return all.Select(e => e).Where(
-                e => UserHaveAcces(userId, e.Id).Result);
+            var all = await _albumService.GetAllFor(userId,ownerId,page,take);
+
+            //return all.Select(e => e).Where(
+            //    e => UserHaveAcces(userId, e.Id).Result);
+            return all;
         }
         public async Task<PublishAlbum> GetOne(Guid userId, Guid publishAlbumId)
         {

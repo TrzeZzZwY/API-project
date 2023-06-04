@@ -2,16 +2,19 @@
 using AppCore.Interfaces.Services;
 using AppCore.Models;
 using AppCore.Models.Enums;
+using Azure;
 using Infrastructure.EF.Entities;
 using Infrastructure.EF.Mappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.EF.Services
 {
@@ -35,23 +38,29 @@ namespace Infrastructure.EF.Services
             if (duplicate is not null)
             {
                 await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
-                if ((duplicate.Album is null && albumName is null) ||
-                    (duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
+                if ((duplicate.Album is null && albumName is null) ||(duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
                     throw new NameDuplicateException($"name: {entity.ImageName} is already in use in that album");
             }
-            entity.User = user;           
+
+            entity.User = user;
+            //sprtawdzenie czy podany album istnieje
             if (albumName is not null)
             {
                 var album = await _context.Albums.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.Name == albumName)
                     ?? throw new ArgumentException(message: $"Invalid album name {albumName}");
                 entity.Album = album;
             }
+
+            //przypisanie tagów
             HashSet<PublishTagEntity> tags = new HashSet<PublishTagEntity>();
             foreach (var item in publish.PublishTags)
             {
-                tags = _context.Tags.Where(e => publish.PublishTags.Any(x => x.Name == e.Name)).ToHashSet();
-            }
+              var tag = await _context.Tags.FirstOrDefaultAsync(e => e.Name == item.Name);
+                if (tag is not null)
+                    tags.Add(tag);
+            }          
             entity.PublishTags = tags;
+            
             entity.FileName = Guid.NewGuid().ToString();
             var saved = await _context.Publishes.AddAsync(entity);
             await _context.SaveChangesAsync();
@@ -84,30 +93,41 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(copy);
         }
 
-        public Task<IEnumerable<Publish>> GetAll()
+        public Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
         {
-            return Task.FromResult(EntityMapper.Map(_context.Publishes
-                        .Include(e => e.UserLikes)
-                        .Include(e => e.Comments)
-                        .Include(e => e.Album)
-                        .Include(e => e.PublishTags)));
+            var query = _context.Publishes
+                         .Include(e => e.UserLikes)
+                         .Include(e => e.Comments)
+                         .Include(e => e.Album)
+                         .Include(e => e.PublishTags);
+            var acces = query.Where(e =>
+               (e.Status == Status.Visible) ||
+               (e.User.Id == userId.ToString()) ||
+               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            var publishes = QueryFilter.Paginate(acces, page, take).ToList();
+            return Task.FromResult(EntityMapper.Map(publishes));
         }
 
-        public Task<IEnumerable<Publish>> GetAllFor(Guid ownerId, string? albumName)
+        public Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, int page, int take)
         {
-            if (albumName is not null)
-                return Task.FromResult(
-                    EntityMapper.Map(
-                        _context.Publishes
-                        .Where(e => e.Album.Name == albumName && e.User.Id == ownerId.ToString())
-                        .Include(e => e.UserLikes)
-                        .Include(e => e.Album)
-                        .Include(e => e.PublishTags)));
-            return Task.FromResult(EntityMapper.Map(_context.Publishes
-                        .Where(e => e.Album == null && e.User.Id == ownerId.ToString())
-                        .Include(e => e.UserLikes)
-                        .Include(e => e.Album)
-                        .Include(e => e.PublishTags)));
+            IQueryable<PublishEntity> query = (albumName is not null) ?
+                _context.Publishes
+                    .Where(e => e.Album.Name == albumName && e.User.Id == ownerId.ToString())
+                    .Include(e => e.UserLikes)
+                    .Include(e => e.Album)
+                    .Include(e => e.PublishTags)           
+                :
+                 _context.Publishes
+                    .Where(e => e.Album == null && e.User.Id == ownerId.ToString())
+                    .Include(e => e.UserLikes)
+                    .Include(e => e.Album)
+                    .Include(e => e.PublishTags);
+            var acces = query.Where(e =>
+              (e.Status == Status.Visible) ||
+              (e.User.Id == userId.ToString()) ||
+              (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            var publishes = QueryFilter.Paginate(acces, page, take).ToList();
+            return Task.FromResult(EntityMapper.Map(publishes));
         }
 
         public async Task<uint> GetLikes(Guid ownerId, string imageName, string? albumName)
@@ -185,16 +205,16 @@ namespace Infrastructure.EF.Services
             bool duplucate = false;
             if (targetAlbumName is not null)
             {
-                 album = await _context.Albums.FirstOrDefaultAsync(e => e.Name == targetAlbumName && e.User.Id == find.User.Id)
-                    ?? throw new ArgumentException($"User don't have album named {targetAlbumName}");
+                album = await _context.Albums.FirstOrDefaultAsync(e => e.Name == targetAlbumName && e.User.Id == find.User.Id)
+                   ?? throw new ArgumentException($"User don't have album named {targetAlbumName}");
                 await _context.Entry(album).Collection(e => e.Publishes).LoadAsync();
-                if(album.Publishes.Any(e => e.ImageName == find.ImageName))
+                if (album.Publishes.Any(e => e.ImageName == find.ImageName))
                     throw new ArgumentException($"album {album.Name} already contrains publish named {find.ImageName}");
             }
             else
             {
                 album = null;
-                if(_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == null && e.ImageName == find.ImageName))
+                if (_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == null && e.ImageName == find.ImageName))
                     throw new ArgumentException($"primary album already contrains publish named {find.ImageName}");
             }
 
@@ -233,7 +253,14 @@ namespace Infrastructure.EF.Services
             find.ImageName = publish.ImageName;
             find.Description = publish.Description;
             find.Camera = publish.Camera;
-            find.PublishTags = EntityMapper.Map(publish.PublishTags).ToHashSet();
+            HashSet<PublishTagEntity> tags = new HashSet<PublishTagEntity>();
+            foreach (var item in publish.PublishTags)
+            {
+                var tag = await _context.Tags.FirstOrDefaultAsync(e => e.Name == item.Name);
+                if (tag is not null)
+                    tags.Add(tag);
+            }
+            find.PublishTags = tags;
             _context.Publishes.Update(find);
             _context.SaveChanges();
             return EntityMapper.Map(find);
@@ -269,11 +296,11 @@ namespace Infrastructure.EF.Services
         {
             List<PublishEntity> find = new List<PublishEntity>();
             if (albumName is not null)
-                find =  _context.Publishes.Where(e =>
+                find = _context.Publishes.Where(e =>
                         e.User.Id == ownerId.ToString() &&
                         e.Album.Name == albumName).ToList();
             else
-                find =  _context.Publishes.Where(e =>
+                find = _context.Publishes.Where(e =>
                         e.User.Id == ownerId.ToString() &&
                         e.Album == null).ToList();
             if (find is null)

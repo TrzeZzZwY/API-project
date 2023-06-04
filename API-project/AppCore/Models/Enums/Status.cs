@@ -9,7 +9,7 @@ namespace AppCore.Models.Enums
 {
     public enum Status
     {
-       Visible = 0,
-       Hidden = 1
+       Visible,
+       Hidden
     }
 }

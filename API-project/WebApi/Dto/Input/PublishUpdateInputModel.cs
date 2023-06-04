@@ -8,6 +8,6 @@ namespace WebApi.Dto.Input
         public Cameras NewCamera { get; set; }
         public string? NewDescription { get; set; }
         public Status NewStatus { get; set; }
-        public HashSet<PublishTagInputDto> NewTags { get; set; }
+        public PublishTagInputDto[] NewTags { get; set; }
     }
 }
