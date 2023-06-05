@@ -12,6 +12,7 @@ namespace AppCore.Models
     {
         public Guid Id { get; set; }
         public Publish? Publish { get; set; }
+        public string UserName { get; set; }
         public string Content { get; set; }
         public bool IsEdited { get; set; } = false;
     }

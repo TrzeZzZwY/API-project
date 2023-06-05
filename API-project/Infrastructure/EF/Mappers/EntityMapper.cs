@@ -101,7 +101,8 @@ namespace Infrastructure.EF.Mappers
                 Id = p.Id,
                 Content = p.CommentContent,
                 IsEdited = p.IsEdited,
-                Publish = p.publish is null ? null : Map(p.publish)
+                UserName = p.User.UserName,
+                Publish = null //p.publish is null ? null : Map(p.publish)
             };
         }
         public static IEnumerable<Comment> Map(IEnumerable<CommentEntity> p)

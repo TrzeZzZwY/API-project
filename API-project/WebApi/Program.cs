@@ -70,6 +70,7 @@ builder.Services.AddScoped<ServiceAuthorization>();
 builder.Services.AddScoped<EfAlbumServiceAuthorized>();
 builder.Services.AddScoped<EfTagServiceAuthorized>();
 builder.Services.AddScoped<EfPublishServiceAuthorized>();
+builder.Services.AddScoped<EfCommentServiceAuthorized>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -96,7 +97,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-    options.SchemaFilter<EnumSchemaFilter>();   
+    //options.SchemaFilter<EnumSchemaFilter>();   
     });
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

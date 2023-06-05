@@ -51,19 +51,36 @@ namespace Infrastructure.EF.Services
         public async Task<PublishAlbum> Delete(Guid albumId)
         {
             var album = await GetAlbumAsync(albumId);
-            var removed = _context.Albums.Remove(album); //TODO jak nie ma kaskadowego usuwanie publikacji w albumie to trzeba dodać
+            await _context.Entry(album).Collection(e => e.Publishes).LoadAsync();
+            var publishes = album.Publishes;
+            foreach (var item in album.Publishes)
+            {
+                _context.Publishes.Remove(item);
+            }
+            var removed = _context.Albums.Remove(album);
             await _context.SaveChangesAsync();
-            return EntityMapper.Map(removed.Entity);
+            var entity = removed.Entity;
+            entity.Publishes = publishes;
+            return EntityMapper.Map(entity);
         }
         public async Task<IEnumerable<PublishAlbum>> DeleteAll(Guid ownerId)
         {
             var albums =await GetAllAlbums(ownerId);
             var a = albums.ToList();
+            List<PublishEntity> publishEntities = new List<PublishEntity>();
+            foreach (var album in albums)
+            {
+                foreach (var publish in album.Publishes)
+                {
+                    publishEntities.Add(publish);
+                    _context.Publishes.Remove(publish);
+                }
+            }
             _context.Albums.RemoveRange(albums);
             await _context.SaveChangesAsync();
             return EntityMapper.Map(a);
         }
-        public Task<IEnumerable<PublishAlbum>> GetAll(Guid userId, int page, int take)
+        public async Task<IEnumerable<PublishAlbum>> GetAll(Guid userId, int page, int take)
         {
             var query = _context.Albums.Include(e => e.Publishes).Include(e => e.User);
             var acces = query.Where(e =>
@@ -71,13 +88,22 @@ namespace Infrastructure.EF.Services
                 (e.User.Id == userId.ToString()) ||
                 (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result)
             );
-            var albums = QueryFilter.Paginate(acces, page, take).ToList();
-            return Task.FromResult(EntityMapper.Map(albums));
+            var albums = QueryFilter.Paginate(acces, page, take);
+
+            foreach (var album in albums)
+            {
+                foreach (var item in album.Publishes)
+                {
+                    await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+                }
+            }
+
+            return EntityMapper.Map(albums.ToList());
         }
-        public Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId, int page, int take)
+        public async Task<IEnumerable<PublishAlbum>> GetAllFor(Guid userId, Guid ownerId, int page, int take)
         {
             var query = _context.Albums
-                .Where(e => e.User.Id == ownerId.ToString()) //Dostęp
+                .Where(e => e.User.Id == ownerId.ToString())
                 .Include(e => e.Publishes)
                 .Include(e => e.User);
 
@@ -86,8 +112,17 @@ namespace Infrastructure.EF.Services
                 (e.User.Id == userId.ToString()) ||
                 (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result)
             );
-            var albums = QueryFilter.Paginate(acces, page, take).ToList();
-            return Task.FromResult(EntityMapper.Map(albums));
+
+            var albums = QueryFilter.Paginate(acces, page, take);
+
+            foreach (var album in albums)
+            {
+                foreach (var item in album.Publishes)
+                {
+                    await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+                }
+            }
+            return EntityMapper.Map(albums.ToList());
         }
         public async Task<PublishAlbum> GetOne(Guid publishAlbumId)
         {

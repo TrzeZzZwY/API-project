@@ -12,6 +12,7 @@ using System.Security.Claims;
 using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
 using WebApi.Dto.Output;
+using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
@@ -22,15 +23,17 @@ namespace WebApi.Controllers
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfAlbumServiceAuthorized _albumService;
-        public AlbumController(UserManager<UserEntity> userManager, EfAlbumServiceAuthorized albumService)
+        private readonly IWebHostEnvironment _hostEnvironment;
+        public AlbumController(UserManager<UserEntity> userManager, EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _albumService = albumService;
+            _hostEnvironment = hostEnvironment;
         }
 
         [HttpPost]
-        [Route("AddAlbum")]
-        public async Task<IActionResult> AddAlbum([FromForm] PublishAlbumInputDto inputDto)
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromForm] PublishAlbumInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -52,8 +55,8 @@ namespace WebApi.Controllers
             }
         }
         [HttpPatch]
-        [Route("UpdateAlbum/{albumName}")]
-        public async Task<IActionResult> UpateAlbum([FromBody] PublishAlbumInputDto inputDto, [FromRoute] string albumName)
+        [Route("Update/{albumName}")]
+        public async Task<IActionResult> Update([FromBody] PublishAlbumInputDto inputDto, [FromRoute] string albumName)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -84,26 +87,23 @@ namespace WebApi.Controllers
 
         [HttpGet]
         [Route("GetAll")]
-        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllAlbums([FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
             if (user is null)
                 return BadRequest();
 
-            var all = await _albumService.GetAll(Guid.Parse(user.Id),(int)page,(int)take);
+            var all = await _albumService.GetAll(Guid.Parse(user.Id), (int)page, (int)take);
             var mapped = DtoMapper.Map(all);
             return Ok(mapped);
         }
         [HttpGet]
         [Route("GetAllFor/{userLogin}")]
-        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllAlbumsFor([FromRoute] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllFor([FromRoute] string userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
-            if (user is null)
-                return BadRequest();
-            //if(userLogin) zawiera niedopuszcalne znaki return bad request
-            var targetUser = await _userManager.FindByNameAsync(userLogin);
-            if (targetUser is null)
+            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || targetUser is null)
                 return BadRequest();
 
             var albums = await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), (int)page, (int)take);
@@ -116,12 +116,11 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishAlbumOutputDto>> GetOne([FromRoute] string userLogin, [FromRoute] string albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || targetUser is null)
                 return BadRequest();
 
-            var targetUser = await _userManager.FindByNameAsync(userLogin);
-            if (targetUser is null)
-                return BadRequest();
+
             try
             {
                 return Ok(DtoMapper.Map(await _albumService.GetOne(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), albumName)));
@@ -146,7 +145,15 @@ namespace WebApi.Controllers
 
             try
             {
-                return Ok(DtoMapper.Map(await _albumService.Delete(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName)));
+                var deleted = await _albumService.Delete(Guid.Parse(user.Id), Guid.Parse(user.Id), albumName);
+                List<string> fileNames = new List<string>();
+                foreach (var item in deleted.Publishes)
+                {
+                    fileNames.Add(item.FileName);
+                }
+                ImageManagement.DeleteImage(user, fileNames, _hostEnvironment);
+                var mapped = DtoMapper.Map(deleted);
+                return Ok();
             }
             catch (AccessViolationException)
             {
@@ -157,7 +164,7 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }
-        [HttpDelete]
+        /*[HttpDelete]
         [Route("DeleteAll")]
         public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll()
         {
@@ -177,20 +184,29 @@ namespace WebApi.Controllers
             {
                 return NotFound();
             }
-        }
+        }*/
         [HttpDelete]
         [Authorize(Roles = "Admin")]
         [Route("DeleteAllFor/{userLogin}")]
         public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll([FromRoute] string userLogin)
         {
             var user = await GetCurrentUser();
-            var targetUser = await _userManager.FindByNameAsync(userLogin);
+            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
 
             try
             {
-                return Ok(DtoMapper.Map(await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(targetUser.Id))));
+                var deleted = await _albumService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(targetUser.Id));
+                List<string> fileNames = new List<string>();
+                foreach (var album in deleted)
+                    foreach (var item in album.Publishes)
+                    {
+                        fileNames.Add(item.FileName);
+                    }
+                ImageManagement.DeleteImage(user, fileNames, _hostEnvironment);
+                var mapped = DtoMapper.Map(deleted);
+                return Ok();
             }
             catch (AccessViolationException)
             {

@@ -11,14 +11,13 @@ namespace AppCore.Interfaces.Services
     {
         public Task<IEnumerable<Comment>> GetAll(Guid userId, int page, int take);
         public Task<IEnumerable<Comment>> GetAllForPublish(Guid userId, Guid publishId, int page, int take);
-        public Task<IEnumerable<Comment>> GetAllForComment(Guid userId, Guid commentId, int page, int take);
+        public Task<IEnumerable<Comment>> GetAllForPublish(Guid userId, Guid ownerId, string? albumName, string imageName, int page, int take);
+        public Task<IEnumerable<Comment>> GetAllForUser(Guid userId, Guid TargetUserId, int page, int take);
         public Task<Comment> GetOne(Guid commentId);
-        public Task<Comment> Create(Comment comment, Guid publishId);
-        public Task<Comment> Create(Comment comment, Guid albumId, string imageName);
-        public Task<Comment> Create(Comment comment, Guid userId,string? albumName, string imageName);
-        public Task<Comment> Create2(Comment comment, Guid commentId);
+        public Task<Comment> Create(Guid userId, Guid publishId, Comment comment);
+        public Task<Comment> Create(Guid userId, Guid ownerId, string? albumName, string imageName, Comment comment);
         public Task<Comment> Delete(Guid commentId);
         public Task<Comment> Update(Guid commentId, Comment comment);
-
+        public Task<bool> IsUserOwner(Guid userId, Guid commentId);
     }
 }

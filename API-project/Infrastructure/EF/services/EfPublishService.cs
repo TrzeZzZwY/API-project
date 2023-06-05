@@ -93,7 +93,7 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(copy);
         }
 
-        public Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
         {
             var query = _context.Publishes
                          .Include(e => e.UserLikes)
@@ -104,11 +104,16 @@ namespace Infrastructure.EF.Services
                (e.Status == Status.Visible) ||
                (e.User.Id == userId.ToString()) ||
                (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
-            var publishes = QueryFilter.Paginate(acces, page, take).ToList();
-            return Task.FromResult(EntityMapper.Map(publishes));
+            var publishes = QueryFilter.Paginate(acces, page, take);
+
+            foreach (var item in publishes)
+            {
+                await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+            }
+            return EntityMapper.Map(publishes.ToList());
         }
 
-        public Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, int page, int take)
         {
             IQueryable<PublishEntity> query = (albumName is not null) ?
                 _context.Publishes
@@ -126,8 +131,13 @@ namespace Infrastructure.EF.Services
               (e.Status == Status.Visible) ||
               (e.User.Id == userId.ToString()) ||
               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
-            var publishes = QueryFilter.Paginate(acces, page, take).ToList();
-            return Task.FromResult(EntityMapper.Map(publishes));
+            var publishes = QueryFilter.Paginate(acces, page, take);
+
+            foreach (var item in publishes)
+            {
+                await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+            }
+            return EntityMapper.Map(publishes.ToList());
         }
 
         public async Task<uint> GetLikes(Guid ownerId, string imageName, string? albumName)

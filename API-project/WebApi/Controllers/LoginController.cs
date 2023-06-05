@@ -1,7 +1,9 @@
-﻿using Infrastructure.EF.Entities;
+﻿using AppCore.Models;
+using Infrastructure.EF.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -30,7 +32,8 @@ namespace WebApi.Controllers
         {
             if (user is null)
                 return BadRequest();
-            var find = await _userManager.FindByNameAsync(user.Login);
+            //var find = await _userManager.FindByNameAsync(user.Login);
+            var find = await _userManager.Users.FirstOrDefaultAsync(e => e.UserName == user.Login);
             if (find is not null)
                 return BadRequest();
             UserEntity newUser = new UserEntity()
@@ -40,7 +43,7 @@ namespace WebApi.Controllers
             };
             var saved = await _userManager.CreateAsync(newUser, user.Password);
             await _userManager.AddToRoleAsync(newUser, "USER");
-            find = await _userManager.FindByNameAsync(user.Login);
+            find = await _userManager.Users.FirstOrDefaultAsync(e => e.UserName == user.Login);
             return Created(find.Id, find);
         }
         [HttpPost]
@@ -50,7 +53,7 @@ namespace WebApi.Controllers
         {
             if (u is null)
                 return BadRequest();
-            var find = await _userManager.FindByNameAsync(u.Login);
+            var find = await _userManager.Users.FirstOrDefaultAsync(e => e.UserName == u.Login);
             if (find is not null)
                 return BadRequest();
             UserEntity newUser = new UserEntity()
@@ -60,7 +63,7 @@ namespace WebApi.Controllers
             };
             var saved = await _userManager.CreateAsync(newUser, u.Password);
             await _userManager.AddToRoleAsync(newUser, "ADMIN");
-            find = await _userManager.FindByNameAsync(u.Login);
+            find = await _userManager.Users.FirstOrDefaultAsync(e => e.UserName == u.Login);
             return Created(find.Id, find);
         }
         [HttpPost]
@@ -105,7 +108,10 @@ namespace WebApi.Controllers
 
         private async Task<UserEntity?> Authenticated(UserLogin u)
         {
-            var find = await _userManager.FindByNameAsync(u.Login);
+            var find = await _userManager.Users.FirstOrDefaultAsync(e=> e.UserName == u.Login);
+            string userName = find.UserName;
+            bool a = userName == u.Login;
+            var users = _userManager.Users.ToList();
             if (find is not null &&
                 await _userManager.CheckPasswordAsync(find, u.Password))
                 return find;

@@ -2,7 +2,7 @@
 
 namespace WebApi.Dto.Input
 {
-    public class PublishUpdateInputModel
+    public class PublishUpdateInputDto
     {
         public string NewImageName { get; set; }
         public Cameras NewCamera { get; set; }

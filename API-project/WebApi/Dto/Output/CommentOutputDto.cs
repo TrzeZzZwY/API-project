@@ -7,5 +7,6 @@ namespace WebApi.Dto.Output
     {
         public string UserLogin { get; set; }
         public string CommentContent { get; set; }
+        public bool IsEdited { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
 using WebApi.Dto.Output;
+using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
@@ -28,8 +29,10 @@ namespace WebApi.Controllers
         }
         [HttpPost]
         [Route("CreatePost")]
-        public async Task<ActionResult<PublishOutputDto>> SavePublish([FromForm]PublishInputDto input)
+        public async Task<ActionResult<PublishOutputDto>> SavePublish([FromForm] PublishInputDto input)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Model is not valid");
             //image processor
             var user = await GetCurrentUser();
             if (user is null || input.Image is null)
@@ -45,7 +48,7 @@ namespace WebApi.Controllers
                     input.AlbumName,
                     DtoMapper.Map(input));
 
-                SaveImage(user, input.Image, entity.FileName);
+                ImageManagement.SaveImage(user, input.Image, entity.FileName,_hostEnvironment);
 
                 var mapped = DtoMapper.Map(entity);
                 return Created("", mapped);
@@ -58,12 +61,16 @@ namespace WebApi.Controllers
         }
         [HttpPatch]
         [Route("UpdatePost/{userLogin}/{imageName}")]
-        public async Task<ActionResult<PublishOutputDto>> Update([FromBody] PublishUpdateInputModel input, [FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
+        public async Task<ActionResult<PublishOutputDto>> Update([FromBody] PublishUpdateInputDto input, [FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Model is not valid");
+
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
             try
             {
                 var entity = await _publishService.Update(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName, DtoMapper.Map(input));
@@ -80,14 +87,14 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes([FromRoute] string userLogin, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
-                var publish = await _publishService.GetAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName,(int)page, (int)take);
+                var publish = await _publishService.GetAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName, (int)page, (int)take);
                 return Ok(DtoMapper.Map(publish));
             }
             catch (AccessViolationException e)
@@ -100,10 +107,10 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishOutputDto>> GetImageDetails([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
@@ -120,10 +127,10 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishOutputDto>> GetImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
@@ -155,10 +162,10 @@ namespace WebApi.Controllers
         public async Task<ActionResult<uint>> Like([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
@@ -174,10 +181,10 @@ namespace WebApi.Controllers
         public async Task<ActionResult<uint>> Unlike([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
@@ -193,10 +200,10 @@ namespace WebApi.Controllers
         public async Task<ActionResult<bool>> Move([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? oldAlbumName, [FromQuery] string? newAlbumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
@@ -212,14 +219,16 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishOutputDto>> Delete([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
-                await _publishService.Delete(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
+                var publish = await _publishService.Delete(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
+                string[] a = new string[] { publish.FileName};
+                ImageManagement.DeleteImage(target, a,_hostEnvironment);
                 return NoContent();
             }
             catch (Exception e)
@@ -232,14 +241,20 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<PublishOutputDto>>> Delete([FromRoute] string userLogin, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
-            if (user is null)
+            var target = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            if (user is null || target is null)
                 return BadRequest();
-
-            var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
+            //var target = await _userManager.FindByNameAsync(userLogin) ?? throw new ArgumentException();
 
             try
             {
-                await _publishService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName);
+                var publishes = await _publishService.DeleteAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName);
+                List<string> files = new List<string>();
+                foreach (var item in publishes)
+                {
+                    files.Add(item.FileName);
+                }
+                ImageManagement.DeleteImage(target, files,_hostEnvironment);
                 return NoContent();
             }
             catch (Exception e)
@@ -256,15 +271,7 @@ namespace WebApi.Controllers
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
         }
-        private async void SaveImage(UserEntity user, IFormFile image, string FileName)
-        {
-            string dir = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads", user.UserName);
-            Directory.CreateDirectory(dir);
-            string path = Path.Combine(dir, FileName + Path.GetExtension(image.FileName));
-            using (Stream fileStream = new FileStream(path, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
-        }
+       
+
     }
 }

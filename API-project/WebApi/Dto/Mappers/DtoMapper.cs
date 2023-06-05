@@ -21,7 +21,7 @@ namespace WebApi.Dto.Mappers
                 Name = p.Name,
                 UserName = p.UserName,
                 Status = p.Status,
-                Publishes = p.Publishes is null ? new List<PublishOutputDto>() : Map(p.Publishes).ToHashSet()
+                Publishes = p.Publishes is null ? new List<PublishOutputDto>() : Map(p.Publishes).ToHashSet()               
             };
         }
         public static IEnumerable<PublishAlbumOutputDto> Map(IEnumerable<PublishAlbum> p)
@@ -64,8 +64,9 @@ namespace WebApi.Dto.Mappers
                 throw new ArgumentException(message: "Argument can't be null");
 
             return new CommentOutputDto() {
-                UserLogin = "",
-                CommentContent = p.Content
+                UserLogin = p.UserName,
+                CommentContent = p.Content,
+                IsEdited = p.IsEdited
                 };
         }
         public static IEnumerable<CommentOutputDto> Map(IEnumerable<Comment> p)
@@ -162,7 +163,7 @@ namespace WebApi.Dto.Mappers
             foreach (var item in p)
                 yield return Map(item);
         }
-        public static Publish Map(PublishUpdateInputModel p)
+        public static Publish Map(PublishUpdateInputDto p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
@@ -175,7 +176,23 @@ namespace WebApi.Dto.Mappers
                 PublishTags = p.NewTags is null? new HashSet<PublishTag>() : Map(p.NewTags).ToHashSet()            
             };
         }
-        public static IEnumerable<Publish> Map(IEnumerable<PublishUpdateInputModel> p)
+        public static IEnumerable<Publish> Map(IEnumerable<PublishUpdateInputDto> p)
+        {
+            if (p is null)
+                throw new ArgumentException(message: "Argument can't be null");
+            foreach (var item in p)
+                yield return Map(item);
+        }
+        public static Comment Map(CommentUpdateInputDto p)
+        {
+            if (p is null)
+                throw new ArgumentException(message: "Argument can't be null");
+            return new Comment()
+            {
+                Content = p.NewCommentContent
+            };
+        }
+        public static IEnumerable<Comment> Map(IEnumerable<CommentUpdateInputDto> p)
         {
             if (p is null)
                 throw new ArgumentException(message: "Argument can't be null");
