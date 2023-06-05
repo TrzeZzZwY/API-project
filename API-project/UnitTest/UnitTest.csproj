@@ -30,4 +30,8 @@
 		<ProjectReference Include="..\WebApi\WebApi.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="EfServiceTest\" />
+	</ItemGroup>
+
 </Project>
