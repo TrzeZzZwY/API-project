@@ -50,19 +50,19 @@ namespace Infrastructure.EF.Services.Authorized
         {
             return await _tagService.GetOne(tagName);
         }
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, Guid tagId, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId,Guid? target, Guid tagId, int page, int take)
         {
             //if (await UserIsAdmin(userId))
             //    return await _tagService.GetAllPublishesForTag(tagId);
             //return (await _tagService.GetAllPublishesForTag(tagId)).Where(e => e.Status == Status.Visible);
-            return await _tagService.GetAllPublishesForTag(userId, tagId, page, take);
+            return await _tagService.GetAllPublishesForTag(userId, target, tagId, page, take);
         }
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, string tagName, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, Guid? target, string tagName, int page, int take)
         {
             //if (await UserIsAdmin(userId))
             //    return await _tagService.GetAllPublishesForTag(tagName);
             //return (await _tagService.GetAllPublishesForTag(tagName)).Where(e => e.Status == Status.Visible);
-            return await _tagService.GetAllPublishesForTag(userId, tagName, page, take);
+            return await _tagService.GetAllPublishesForTag(userId, target, tagName, page, take);
         }
         public async Task<PublishTag> Delete(Guid userId,Guid tagId)
         {

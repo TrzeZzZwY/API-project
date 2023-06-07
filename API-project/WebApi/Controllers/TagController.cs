@@ -6,6 +6,7 @@ using Infrastructure.EF.Services.Authorized;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Security.Claims;
 using WebApi.Dto.Input;
@@ -82,6 +83,46 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }
+
+        [HttpGet]
+        [Route("GetAllTags")]
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+
+            return Ok(DtoMapper.Map(await _tagService.GetAll(Guid.Parse(user.Id),(int)page,(int)take)));
+        }
+
+        [HttpGet]
+        [Route("GetOneTag/{tagName}")]
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromRoute] string tagName)
+        {
+            var user = await GetCurrentUser();
+            if (user is null)
+                return BadRequest();
+            
+            return Ok(DtoMapper.Map(await _tagService.GetOne(tagName)));
+        }
+        [HttpGet]
+        [Route("GetPublishesForTag/{tagName}")]
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAllPublishesForTag([FromRoute] string tagName,[FromQuery]string? userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        {
+            var user = await GetCurrentUser();
+            UserEntity? target = null;
+            if(userLogin is not null)
+            {
+                target = await GetTargetUser(userLogin);
+                if (target is null)
+                    return BadRequest();
+            }
+            if (user is null)
+                return BadRequest();
+
+            Guid? targetId = target is null ? null : Guid.Parse(target.Id);
+            return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),targetId ,tagName,(int)page,(int)take)));
+        }
         [HttpDelete]
         [Route("DeleteTag/{tagName}")]
         [Authorize(Roles = "Admin")]
@@ -106,38 +147,6 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }
-
-        [HttpGet]
-        [Route("GetAllTags")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
-        {
-            var user = await GetCurrentUser();
-            if (user is null)
-                return BadRequest();
-
-            return Ok(DtoMapper.Map(await _tagService.GetAll(Guid.Parse(user.Id),(int)page,(int)take)));
-        }
-
-        [HttpGet]
-        [Route("GetOneTag/{tagName}")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromRoute] string tagName)
-        {
-            var user = await GetCurrentUser();
-            if (user is null)
-                return BadRequest();
-
-            return Ok(DtoMapper.Map(await _tagService.GetOne(tagName)));
-        }
-        [HttpGet]
-        [Route("GetPublishesForTag/{tagName}")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAllPublishesForTag([FromRoute] string tagName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
-        {
-            var user = await GetCurrentUser();
-            if (user is null)
-                return BadRequest();
-
-            return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),tagName,(int)page,(int)take)));
-        }
         private async Task<UserEntity?> GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -146,6 +155,13 @@ namespace WebApi.Controllers
             var userId = identity.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value;
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
+        }
+        private async Task<UserEntity?> GetTargetUser(string username)
+        {
+            var find = await _userManager.Users.FirstOrDefaultAsync(e => username.Equals(e.UserName));
+            if (find.UserName != username)
+                return null;
+            return find;
         }
     }
 }

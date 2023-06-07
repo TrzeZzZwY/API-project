@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
@@ -34,7 +35,7 @@ namespace WebApi.Controllers
                 return BadRequest("Model is not valid");
 
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == inputDto.UserName);
+            var targetUser = await GetTargetUser(inputDto.UserName);
             if (user is null || targetUser is null)
                 return BadRequest();
 
@@ -104,7 +105,7 @@ namespace WebApi.Controllers
 
 
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            var targetUser = await GetTargetUser(userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
 
@@ -128,7 +129,7 @@ namespace WebApi.Controllers
 
 
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            var targetUser = await GetTargetUser(userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
 
@@ -195,6 +196,14 @@ namespace WebApi.Controllers
             var userId = identity.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value;
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
+        }
+
+        private async Task<UserEntity?> GetTargetUser(string username)
+        {
+            var find = await _userManager.Users.FirstOrDefaultAsync(e => username.Equals(e.UserName));
+            if (find.UserName != username)
+                return null;
+            return find;
         }
     }
 }

@@ -6,6 +6,7 @@ using Infrastructure.EF.Services.Authorized;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.Security.Claims;
@@ -102,7 +103,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllFor([FromRoute] string userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            var targetUser = await GetTargetUser(userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
 
@@ -116,10 +117,9 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishAlbumOutputDto>> GetOne([FromRoute] string userLogin, [FromRoute] string albumName)
         {
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            var targetUser = await GetTargetUser(userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
-
 
             try
             {
@@ -191,7 +191,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll([FromRoute] string userLogin)
         {
             var user = await GetCurrentUser();
-            var targetUser = _userManager.Users.FirstOrDefault(e => e.UserName == userLogin);
+            var targetUser = await GetTargetUser(userLogin);
             if (user is null || targetUser is null)
                 return BadRequest();
 
@@ -242,6 +242,12 @@ namespace WebApi.Controllers
 
             return userId is null ? null : await _userManager.FindByIdAsync(userId);
         }
-
+        private async Task<UserEntity?> GetTargetUser(string username)
+        {
+            var find = await _userManager.Users.FirstOrDefaultAsync(e => username.Equals(e.UserName));
+            if (find.UserName != username)
+                return null;
+            return find;
+        }
     }
 }

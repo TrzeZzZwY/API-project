@@ -59,14 +59,18 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(tags);
         }
 
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, Guid tagId, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId,Guid? target, Guid tagId, int page, int take)
         {
             var tag = await FindTag(tagId);
-            var query = _context.Publishes.Where(e => e.PublishTags.Contains(tag))
+            var query = _context.Publishes
+                    .Include(e => e.User)
                     .Include(e => e.UserLikes)
                     .Include(e => e.Comments)
                     .Include(e => e.Album)
-                    .Include(e => e.PublishTags);
+                    .Include(e => e.PublishTags)
+                    .Where(e => e.PublishTags.Contains(tag));
+            if (target is not null)
+                query = query.Where(e => e.User.Id == target.ToString());
             var acces = query.Where(e =>
                     (e.Status == Status.Visible) ||
                     (e.User.Id == userId.ToString()) ||
@@ -75,10 +79,10 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(tags);
         }
 
-        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId, string tagName, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllPublishesForTag(Guid userId,Guid? target, string tagName, int page, int take)
         {
             var tag = await FindTag(tagName);
-            return await GetAllPublishesForTag(userId, tag.Id, page, take);
+            return await GetAllPublishesForTag(userId, target, tag.Id, page, take);
         }
 
         public async Task<PublishTag> GetOne(Guid tagId)

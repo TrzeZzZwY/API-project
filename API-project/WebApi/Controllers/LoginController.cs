@@ -108,9 +108,10 @@ namespace WebApi.Controllers
 
         private async Task<UserEntity?> Authenticated(UserLogin u)
         {
-            var find = await _userManager.Users.FirstOrDefaultAsync(e=> e.UserName == u.Login);
-            string userName = find.UserName;
-            bool a = userName == u.Login;
+            var find = await _userManager.Users.FirstOrDefaultAsync(e=> u.Login.Equals(e.UserName));
+            if (find.UserName != u.Login)
+                return null;
+
             var users = _userManager.Users.ToList();
             if (find is not null &&
                 await _userManager.CheckPasswordAsync(find, u.Password))
