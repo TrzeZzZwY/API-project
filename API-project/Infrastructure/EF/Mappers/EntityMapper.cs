@@ -20,7 +20,7 @@ namespace Infrastructure.EF.Mappers
 
             return new CommentEntity()
             {
-                publish = p.Publish is null ? null : Map(p.Publish),
+                Publish = p.Publish is null ? null : Map(p.Publish),
                 CommentContent = p.Content,
                 IsEdited = p.IsEdited
             };

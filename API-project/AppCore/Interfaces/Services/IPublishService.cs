@@ -11,8 +11,8 @@ namespace AppCore.Interfaces.Services
 {
     public interface IPublishService
     {
-        public Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take);
-        public Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, int page, int take);
+        public Task<IEnumerable<Publish>> GetAll(Guid userId,IEnumerable<string>? tagNames, int page, int take);
+        public Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, IEnumerable<string>? tagNames, int page, int take);
         public Task<Publish> GetOne(Guid publishId);
         public Task<Publish> GetOne(Guid albumId, string imageName);
         public Task<Publish> GetOne(Guid ownerId, string imageName, string? albumName);

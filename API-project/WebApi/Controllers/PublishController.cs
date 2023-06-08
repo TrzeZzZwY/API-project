@@ -82,20 +82,29 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetAllPostsFor/{userLogin}")]
-        public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes([FromRoute] string userLogin, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("GetManyPosts")]
+        public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes([FromQuery] string? userLogin, [FromQuery] string[]? tagNames, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
-            var target = await GetTargetUser(userLogin);
-            if (user is null || target is null)
+            if(userLogin is null && albumName is not null)
+                return BadRequest("Type user login");
+
+            if (user is null)
                 return BadRequest();
 
             try
-            {
-                var publish = await _publishService.GetAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName, (int)page, (int)take);
-                return Ok(DtoMapper.Map(publish));
+            {   
+                if(userLogin is not null)
+                {
+                    var target = await GetTargetUser(userLogin);
+                    var publish = await _publishService.GetAll(Guid.Parse(user.Id), Guid.Parse(target.Id), albumName, tagNames, (int)page, (int)take);
+                    return Ok(DtoMapper.Map(publish));
+                }
+                var publishAll = await _publishService.GetAll(Guid.Parse(user.Id),tagNames, (int)page, (int)take);
+                return Ok(DtoMapper.Map(publishAll));
+
             }
-            catch (AccessViolationException e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }

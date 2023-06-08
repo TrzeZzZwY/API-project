@@ -38,7 +38,7 @@ namespace Infrastructure.EF.Services
             if (duplicate is not null)
             {
                 await _context.Entry(duplicate).Reference(e => e.Album).LoadAsync();
-                if ((duplicate.Album is null && albumName is null) ||(duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
+                if ((duplicate.Album is null && albumName is null) || (duplicate.Album is not null && albumName is not null && duplicate.Album.Name == albumName))
                     throw new NameDuplicateException($"name: {entity.ImageName} is already in use in that album");
             }
 
@@ -55,12 +55,12 @@ namespace Infrastructure.EF.Services
             HashSet<PublishTagEntity> tags = new HashSet<PublishTagEntity>();
             foreach (var item in publish.PublishTags)
             {
-              var tag = await _context.Tags.FirstOrDefaultAsync(e => e.Name == item.Name);
+                var tag = await _context.Tags.FirstOrDefaultAsync(e => e.Name == item.Name);
                 if (tag is not null)
                     tags.Add(tag);
-            }          
+            }
             entity.PublishTags = tags;
-            
+
             entity.FileName = Guid.NewGuid().ToString();
             var saved = await _context.Publishes.AddAsync(entity);
             await _context.SaveChangesAsync();
@@ -93,17 +93,24 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(copy);
         }
 
-        public async Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, IEnumerable<string>? tagNames, int page, int take)
         {
-            var query = _context.Publishes
-                         .Include(e => e.UserLikes)
-                         .Include(e => e.Comments)
-                         .Include(e => e.Album)
-                         .Include(e => e.PublishTags);
-            var acces = query.Where(e =>
-               (e.Status == Status.Visible) ||
-               (e.User.Id == userId.ToString()) ||
-               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            var query = _context.Publishes.Include(e => e.UserLikes)
+                                          .Include(e => e.Comments)
+                                          .Include(e => e.Album)
+                                          .Include(e => e.PublishTags)
+                                          .Include(e => e.User);
+            var acces = query.Where(e =>(e.Status == Status.Visible) ||
+                                        (e.User.Id == userId.ToString()) ||
+                                        (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+
+            if (tagNames is not null && tagNames.Count() > 0)
+            {
+                var tags = _context.Tags.Where(e => tagNames.Contains(e.Name)).ToList();
+                acces = acces.Where(e => e.PublishTags.Any(x => tags.Contains(x)));
+            }
+
+
             var publishes = QueryFilter.Paginate(acces, page, take);
 
             foreach (var item in publishes)
@@ -113,31 +120,42 @@ namespace Infrastructure.EF.Services
             return EntityMapper.Map(publishes.ToList());
         }
 
-        public async Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, IEnumerable<string>? tagNames, int page, int take)
         {
-            IQueryable<PublishEntity> query = (albumName is not null) ?
-                _context.Publishes
-                    .Where(e => e.Album.Name == albumName && e.User.Id == ownerId.ToString())
-                    .Include(e => e.UserLikes)
-                    .Include(e => e.Album)
-                    .Include(e => e.PublishTags)           
-                :
-                 _context.Publishes
-                    .Where(e => e.Album == null && e.User.Id == ownerId.ToString())
-                    .Include(e => e.UserLikes)
-                    .Include(e => e.Album)
-                    .Include(e => e.PublishTags);
-            var acces = query.Where(e =>
-              (e.Status == Status.Visible) ||
-              (e.User.Id == userId.ToString()) ||
-              (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            IQueryable<PublishEntity> query =
+                (albumName is not null) ?
+                _context.Publishes.Where(e => e.Album.Name == albumName && e.User.Id == ownerId.ToString())
+                                  .Include(e => e.UserLikes)
+                                  .Include(e => e.Comments)
+                                  .Include(e => e.Album)
+                                  .Include(e => e.PublishTags)
+                                  .Include(e => e.User):
+                _context.Publishes.Where(e => e.Album == null && e.User.Id == ownerId.ToString())
+                                  .Include(e => e.UserLikes)
+                                  .Include(e => e.Comments)
+                                  .Include(e => e.Album)
+                                  .Include(e => e.PublishTags)
+                                  .Include(e => e.User);
+
+            var acces = query.Where(e => (e.Status == Status.Visible) ||
+                                         (e.User.Id == userId.ToString()) ||
+                                         (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+
+            if (tagNames is not null && tagNames.Count() > 0)
+            {
+                var tags = _context.Tags.Where(e => tagNames.Contains(e.Name)).ToList();
+                acces = acces.Where(e => e.PublishTags.Any(x => tags.Contains(x)));
+            }
+
+
             var publishes = QueryFilter.Paginate(acces, page, take);
 
-            foreach (var item in publishes)
-            {
-                await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
-            }
-            return EntityMapper.Map(publishes.ToList());
+            //foreach (var item in publishes)
+            //{
+            //    await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+            //}
+            var list = publishes.ToList();
+            return EntityMapper.Map(list);
         }
 
         public async Task<uint> GetLikes(Guid ownerId, string imageName, string? albumName)

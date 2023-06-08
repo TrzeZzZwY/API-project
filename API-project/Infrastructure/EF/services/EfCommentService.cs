@@ -57,8 +57,8 @@ namespace Infrastructure.EF.Services
         {
             var query = _context.Comments;
             var acces = query.Where(e =>
-              (e.publish.Status == Status.Visible) ||
-              (e.publish.User.Id == userId.ToString()) ||
+              (e.Publish.Status == Status.Visible) ||
+              (e.Publish.User.Id == userId.ToString()) ||
               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
 
             var publishes = QueryFilter.Paginate(acces, page, take).ToList();
@@ -67,10 +67,10 @@ namespace Infrastructure.EF.Services
 
         public Task<IEnumerable<Comment>> GetAllForPublish(Guid userId, Guid publishId, int page, int take)
         {
-            var query = _context.Comments.Where(e => e.publish.Id == publishId);
+            var query = _context.Comments.Where(e => e.Publish.Id == publishId);
             var acces = query.Where(e =>
-              (e.publish.Status == Status.Visible) ||
-              (e.publish.User.Id == userId.ToString()) ||
+              (e.Publish.Status == Status.Visible) ||
+              (e.Publish.User.Id == userId.ToString()) ||
               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
 
             var publishes = QueryFilter.Paginate(acces, page, take).ToList();
@@ -88,8 +88,8 @@ namespace Infrastructure.EF.Services
         {
             var query = _context.Comments.Where(e => e.User.Id == TargetUserId.ToString());
             var acces = query.Where(e =>
-              (e.publish.Status == Status.Visible) ||
-              (e.publish.User.Id == userId.ToString()) ||
+              (e.Publish.Status == Status.Visible) ||
+              (e.Publish.User.Id == userId.ToString()) ||
               (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
 
             var publishes = QueryFilter.Paginate(acces, page, take).ToList();

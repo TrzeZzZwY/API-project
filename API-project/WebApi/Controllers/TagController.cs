@@ -105,7 +105,7 @@ namespace WebApi.Controllers
             
             return Ok(DtoMapper.Map(await _tagService.GetOne(tagName)));
         }
-        [HttpGet]
+        /*[HttpGet]
         [Route("GetPublishesForTag/{tagName}")]
         public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAllPublishesForTag([FromRoute] string tagName,[FromQuery]string? userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
@@ -122,7 +122,7 @@ namespace WebApi.Controllers
 
             Guid? targetId = target is null ? null : Guid.Parse(target.Id);
             return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),targetId ,tagName,(int)page,(int)take)));
-        }
+        }*/
         [HttpDelete]
         [Route("DeleteTag/{tagName}")]
         [Authorize(Roles = "Admin")]

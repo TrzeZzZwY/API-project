@@ -29,15 +29,15 @@ namespace Infrastructure.EF.Services.Authorized
                 return await _publishService.Delete(publishId);
             throw new AccessViolationException();
         }
-        public async Task<Publish> Delete(Guid userId, Guid ownerId,string imageName,string? albumName)
+        public async Task<Publish> Delete(Guid userId, Guid ownerId, string imageName, string? albumName)
         {
-            var album = await _publishService.GetOne(ownerId,imageName,albumName);
+            var album = await _publishService.GetOne(ownerId, imageName, albumName);
             return await Delete(userId, album.Id);
         }
-        public async Task<IEnumerable<Publish>> DeleteAll(Guid userId, Guid ownerId,string? albumName)
+        public async Task<IEnumerable<Publish>> DeleteAll(Guid userId, Guid ownerId, string? albumName)
         {
             if (await UserIsAdmin(userId) || userId == ownerId)
-                return await _publishService.DeleteAll(ownerId,albumName);
+                return await _publishService.DeleteAll(ownerId, albumName);
             throw new AccessViolationException();
         }
 
@@ -49,16 +49,16 @@ namespace Infrastructure.EF.Services.Authorized
                 albumName: albumName);
             return await UserHaveAcces(userId, publish.Id) ? publish : throw new AccessViolationException();
         }
-        public async Task<IEnumerable<Publish>> GetAll(Guid userId, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, string[]? tagNames, int page, int take)
         {
-            var all = await _publishService.GetAll(userId,page,take);
+            var all = await _publishService.GetAll(userId, tagNames, page, take);
             //return all.Where(
             //    e => UserHaveAcces(userId, e.Id).Result).ToList();
             return all;
         }
-        public async Task<IEnumerable<Publish>> GetAll(Guid userId,Guid ownerId, string? albumName, int page, int take)
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, Guid ownerId, string? albumName, string[]? tagNames, int page, int take)
         {
-            var all = await _publishService.GetAllFor(userId,ownerId,albumName,page,take);
+            var all = await _publishService.GetAllFor(userId, ownerId, albumName, tagNames, page, take);
             //return all.Where(
             //    e => UserHaveAcces(userId, e.Id).Result).ToList();
             return all;
@@ -69,9 +69,9 @@ namespace Infrastructure.EF.Services.Authorized
                 return await _publishService.Update(albumId, publish);
             throw new AccessViolationException();
         }
-        public async Task<Publish> Update(Guid userId, Guid ownerId,string imageName,  string? albumName, Publish publish)
+        public async Task<Publish> Update(Guid userId, Guid ownerId, string imageName, string? albumName, Publish publish)
         {
-            var find = await _publishService.GetOne(ownerId,imageName,albumName);
+            var find = await _publishService.GetOne(ownerId, imageName, albumName);
             return await Update(userId, find.Id, publish);
 
         }
@@ -81,7 +81,7 @@ namespace Infrastructure.EF.Services.Authorized
             if (await UserHaveAcces(userId, find.Id) &&
                 !await _publishService.IsUserOwner(userId, find.Id) &&
                 !find.UserPublishLikes.Contains(userId))
-                return await _publishService.Like(userId,find.Id);
+                return await _publishService.Like(userId, find.Id);
             throw new AccessViolationException();
         }
         public async Task<uint> UnLike(Guid userId, Guid ownerId, string imageName, string? albumName)
@@ -93,7 +93,7 @@ namespace Infrastructure.EF.Services.Authorized
                 return await _publishService.Unlike(userId, find.Id);
             throw new AccessViolationException();
         }
-        public async Task<bool> Move(Guid userId,Guid ownerId, string imageName, string? oldAlbum, string? newAlbum)
+        public async Task<bool> Move(Guid userId, Guid ownerId, string imageName, string? oldAlbum, string? newAlbum)
         {
             var find = await _publishService.GetOne(ownerId, imageName, oldAlbum);
             if (await UserHaveAcces(userId, find.Id))

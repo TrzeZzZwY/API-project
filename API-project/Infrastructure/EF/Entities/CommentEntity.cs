@@ -15,7 +15,7 @@ namespace Infrastructure.EF.Entities
 
         public Guid Id { get; set; }
         public UserEntity User { get; set; }
-        public PublishEntity publish { get; set; }
+        public PublishEntity Publish { get; set; }
         public string CommentContent { get; set; }
         public bool IsEdited { get; set; }
     }
