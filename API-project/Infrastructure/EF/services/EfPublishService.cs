@@ -48,6 +48,8 @@ namespace Infrastructure.EF.Services
             {
                 var album = await _context.Albums.FirstOrDefaultAsync(e => e.User.Id == user.Id && e.Name == albumName)
                     ?? throw new ArgumentException(message: $"Invalid album name {albumName}");
+                if (album.Status == Status.Hidden && entity.Status == Status.Visible)
+                    throw new Exception("cannot put visible publish to hidden album");
                 entity.Album = album;
             }
 
@@ -238,6 +240,8 @@ namespace Infrastructure.EF.Services
                 await _context.Entry(album).Collection(e => e.Publishes).LoadAsync();
                 if (album.Publishes.Any(e => e.ImageName == find.ImageName))
                     throw new ArgumentException($"album {album.Name} already contrains publish named {find.ImageName}");
+                if (album.Status == Status.Hidden && find.Status == Status.Visible)
+                    throw new Exception("cannot put visible publish to hidden album");
             }
             else
             {

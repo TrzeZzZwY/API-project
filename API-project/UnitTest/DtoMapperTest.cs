@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using WebApi.Dto.Input;
 using WebApi.Dto.Mappers;
 
 namespace UnitTest
@@ -137,6 +138,62 @@ namespace UnitTest
             Assert.Equal(mapped.CommentContent, comment1.Content);
             Assert.Equal(mapped.IsEdited, comment1.IsEdited);
             Assert.Equal(mapped.UserLogin, comment1.UserName);
+        }
+
+        [Fact]
+        public void DtoMapperToCoreCommentTeat()
+        {
+            var input = new CommentInputDto()
+            {
+                AlbumName = "Album1",
+                CommentContent = "Haha",
+                PublishName = "iamge1",
+                UserName = "User1",
+            };
+            var mapped = DtoMapper.Map(input);
+            Assert.Equal(mapped.Content, input.CommentContent);
+            Assert.False(mapped.IsEdited);
+        }
+        [Fact]
+        public void DtoMapperToCoreAlbumTeat()
+        {
+            var input = new PublishAlbumInputDto()
+            {
+                Name = "album1",
+                Status = Status.Hidden
+            };
+            var mapped = DtoMapper.Map(input);
+            Assert.Equal(mapped.Name, input.Name);
+            Assert.Equal(mapped.Status, input.Status);
+        }
+        [Fact]
+        public void DtoMapperToCorePublishTeat()
+        {
+            var input = new PublishInputDto()
+            {
+                ImageName = "image1",
+                AlbumName = "album1",
+                Status = Status.Hidden,
+                Camera = Cameras.Instax,
+                Description = "imageaDesc",
+                Tags = new List<string>() {"tag1","tag2"}
+            };
+            var mapped = DtoMapper.Map(input);
+            Assert.Equal(mapped.ImageName, input.ImageName);
+            Assert.Equal(mapped.Status, input.Status);
+            Assert.Equal(mapped.Camera, input.Camera);
+            Assert.Equal(mapped.Description, input.Description);
+            Assert.Equal(mapped.PublishTags.Select(e => e.Name), input.Tags);
+        }
+        [Fact]
+        public void DtoMapperToCoreTagTeat()
+        {
+            var input = new PublishTagInputDto()
+            {
+               TagName = "tag1"
+            };
+            var mapped = DtoMapper.Map(input);
+            Assert.Equal(mapped.Name, input.TagName);
         }
     };
 }
