@@ -75,7 +75,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetAll")]
+        [Route("GetMany")]
         public async Task<IActionResult> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
@@ -97,7 +97,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetAllForUser/{userLogin}")]
+        [Route("GetManyForUser/{userLogin}")]
         public async Task<IActionResult> GetAllForUser([FromRoute] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
@@ -121,7 +121,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetAllForPublish/{userLogin}/{imageName}")]
+        [Route("GetManyForPublish/{userLogin}/{imageName}")]
         public async Task<IActionResult> GetAllForPublish([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)

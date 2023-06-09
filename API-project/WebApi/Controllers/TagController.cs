@@ -29,7 +29,7 @@ namespace WebApi.Controllers
             _userManager = userManager;
         }
         [HttpPost]
-        [Route("AddTag")]
+        [Route("Create")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddTag([FromBody]PublishTagInputDto input)
         {
@@ -53,7 +53,7 @@ namespace WebApi.Controllers
             }            
         }
         [HttpPatch]
-        [Route("UpdateTag/{tagName}")]
+        [Route("Update/{tagName}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTag([FromRoute]string tagName,[FromBody] PublishTagInputDto input)
         {
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllTags")]
+        [Route("GetMany")]
         public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
@@ -96,7 +96,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetOneTag/{tagName}")]
+        [Route("GetOne/{tagName}")]
         public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromRoute] string tagName)
         {
             var user = await GetCurrentUser();

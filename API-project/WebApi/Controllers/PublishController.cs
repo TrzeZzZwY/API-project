@@ -59,7 +59,7 @@ namespace WebApi.Controllers
 
         }
         [HttpPatch]
-        [Route("UpdatePost/{userLogin}/{imageName}")]
+        [Route("Update/{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> Update([FromBody] PublishUpdateInputDto input, [FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             if (!ModelState.IsValid)
@@ -82,7 +82,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetManyPosts")]
+        [Route("GetMany")]
         public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes([FromQuery] string? userLogin, [FromQuery] string[]? tagNames, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
@@ -110,7 +110,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetPost/{userLogin}/{imageName}")]
+        [Route("GetOne/{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> GetImageDetails([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
@@ -129,7 +129,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetPostImage/{userLogin}/{imageName}")]
+        [Route("GetOneImage/{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> GetImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
@@ -154,7 +154,7 @@ namespace WebApi.Controllers
 
         }
         [HttpGet]
-        [Route("GetPostMiniImage/{userLogin}/{imageName}")]
+        [Route("GetOneMiniImage/{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> GetMiniImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
@@ -214,7 +214,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("MovePostTo/{userLogin}/{imageName}")]
+        [Route("MoveTo/{userLogin}/{imageName}")]
         public async Task<ActionResult<bool>> Move([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? oldAlbumName, [FromQuery] string? newAlbumName)
         {
             var user = await GetCurrentUser();

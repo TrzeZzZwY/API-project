@@ -34,7 +34,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] PublishAlbumInputDto inputDto)
+        public async Task<IActionResult> Create([FromBody] PublishAlbumInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -86,7 +86,7 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpGet]
+        /*[HttpGet]
         [Route("GetAll")]
         public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
@@ -97,19 +97,34 @@ namespace WebApi.Controllers
             var all = await _albumService.GetAll(Guid.Parse(user.Id), (int)page, (int)take);
             var mapped = DtoMapper.Map(all);
             return Ok(mapped);
-        }
+        }*/
         [HttpGet]
-        [Route("GetAllFor/{userLogin}")]
-        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllFor([FromRoute] string userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("GetMany")]
+        public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllFor([FromQuery] string? userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
-            var targetUser = await GetTargetUser(userLogin);
-            if (user is null || targetUser is null)
+            if (user is null)
                 return BadRequest();
+            try
+            {
+                if(userLogin is not null && userLogin.Length > 1)
+                {
+                    var targetUser = await GetTargetUser(userLogin);
+                    if (targetUser is null)
+                        return BadRequest();
+                    var albums = (await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), (int)page, (int)take)).ToList();
+                    var mapped = DtoMapper.Map(albums);
+                    return Ok(mapped);
+                }
+                var albumsAll = (await _albumService.GetAll(Guid.Parse(user.Id), (int)page, (int)take)).ToList();
+                var mappedAll = DtoMapper.Map(albumsAll);
+                return Ok(mappedAll);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
 
-            var albums = await _albumService.GetAllFor(Guid.Parse(user.Id), Guid.Parse(targetUser.Id), (int)page, (int)take);
-            var mapped = DtoMapper.Map(albums);
-            return Ok(mapped);
         }
 
         [HttpGet]
@@ -185,7 +200,7 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }*/
-        [HttpDelete]
+        /*[HttpDelete]
         [Authorize(Roles = "Admin")]
         [Route("DeleteAllFor/{userLogin}")]
         public async Task<ActionResult<PublishAlbumOutputDto>> DeleteAll([FromRoute] string userLogin)
@@ -216,10 +231,10 @@ namespace WebApi.Controllers
             {
                 return NotFound();
             }
-        }
+        }*/
 
 
-        [HttpGet]
+        /*[HttpGet]
         [Route("Test")]
         public async Task<IActionResult> UserTest()
         {
@@ -231,7 +246,7 @@ namespace WebApi.Controllers
             if (await _userManager.IsInRoleAsync(user, "User"))
                 return Ok("Hello User");
             return Ok("Other Role");
-        }
+        }*/
 
         private async Task<UserEntity?> GetCurrentUser()
         {

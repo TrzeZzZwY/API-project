@@ -107,6 +107,8 @@ namespace Infrastructure.EF.Services
                 .Include(e => e.Publishes)
                 .Include(e => e.User);
 
+            var test = query.ToList();
+
             var acces = query.Where(e =>     
                 (e.Status == Status.Visible) ||
                 (e.User.Id == userId.ToString()) ||
@@ -120,6 +122,10 @@ namespace Infrastructure.EF.Services
                 foreach (var item in album.Publishes)
                 {
                     await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+                    foreach (var comment in item.Comments)
+                    {
+                        await _context.Entry(comment).Reference(e => e.User).LoadAsync();
+                    }
                 }
             }
             return EntityMapper.Map(albums.ToList());
