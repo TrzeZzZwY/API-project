@@ -102,7 +102,7 @@ namespace Infrastructure.EF.Services
                                           .Include(e => e.Album)
                                           .Include(e => e.PublishTags)
                                           .Include(e => e.User);
-            var acces = query.Where(e =>(e.Status == Status.Visible) ||
+            var acces = query.Where(e => (e.Status == Status.Visible) ||
                                         (e.User.Id == userId.ToString()) ||
                                         (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
 
@@ -125,7 +125,34 @@ namespace Infrastructure.EF.Services
             }
             return EntityMapper.Map(publishes.ToList());
         }
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, Guid targetId, int page, int take)
+        {
+            IQueryable<PublishEntity> query = _context.Publishes
+                        .Include(e => e.UserLikes)
+                        .Include(e => e.Comments)
+                        .Include(e => e.Album)
+                        .Include(e => e.PublishTags)
+                        .Include(e => e.User)
+                        .Where(e => e.User.Id == targetId.ToString());
 
+            var test1 = query.ToList();
+            var acces = query.Where(e => (e.Status == Status.Visible) ||
+                                         (e.User.Id == userId.ToString()) ||
+                                         (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
+            var test2 = acces.ToList();
+            var publishes = QueryFilter.Paginate(acces, page, take);
+
+            foreach (var item in publishes)
+            {
+                await _context.Entry(item).Collection(e => e.Comments).LoadAsync();
+                foreach (var comment in item.Comments)
+                {
+                    await _context.Entry(comment).Reference(e => e.User).LoadAsync();
+                }
+            }
+            var list = publishes.ToList();
+            return EntityMapper.Map(list);
+        }
         public async Task<IEnumerable<Publish>> GetAllFor(Guid userId, Guid ownerId, string? albumName, IEnumerable<string>? tagNames, int page, int take)
         {
             IQueryable<PublishEntity> query =
@@ -143,18 +170,15 @@ namespace Infrastructure.EF.Services
                                   .Include(e => e.PublishTags)
                                   .Include(e => e.User)
                                   .Where(e => e.Album == null && e.User.Id == ownerId.ToString());
-            var test1 = query.ToList();
             var acces = query.Where(e => (e.Status == Status.Visible) ||
                                          (e.User.Id == userId.ToString()) ||
                                          (_userManager.IsInRoleAsync(_userManager.FindByIdAsync(userId.ToString()).Result, "Admin").Result));
-            var test2 = acces.ToList();
             if (tagNames is not null && tagNames.Count() > 0)
             {
                 var tags = _context.Tags.Where(e => tagNames.Contains(e.Name)).ToList();
                 acces = acces.Where(e => e.PublishTags.Any(x => tags.Contains(x)));
             }
 
-            var test3 = acces.ToList();
             var publishes = QueryFilter.Paginate(acces, page, take);
 
             foreach (var item in publishes)

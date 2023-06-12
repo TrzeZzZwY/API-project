@@ -56,6 +56,13 @@ namespace Infrastructure.EF.Services.Authorized
             //    e => UserHaveAcces(userId, e.Id).Result).ToList();
             return all;
         }
+        public async Task<IEnumerable<Publish>> GetAll(Guid userId, Guid targetId, int page, int take)
+        {
+            var all = await _publishService.GetAll(userId, targetId, page, take);
+            //return all.Where(
+            //    e => UserHaveAcces(userId, e.Id).Result).ToList();
+            return all;
+        }
         public async Task<IEnumerable<Publish>> GetAll(Guid userId, Guid ownerId, string? albumName, string[]? tagNames, int page, int take)
         {
             var all = await _publishService.GetAllFor(userId, ownerId, albumName, tagNames, page, take);
