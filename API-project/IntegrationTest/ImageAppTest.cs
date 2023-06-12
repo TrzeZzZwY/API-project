@@ -192,6 +192,21 @@ namespace IntegrationTest
                 User = user,
                 Album = userPrivateAlbum
             };
+            PublishEntity userPrivatePublish2 = new PublishEntity()
+            {
+                Id = Guid.NewGuid(),
+                ImageName = "userPublicPublish2",
+                Description = "userPrivatePublishDescription",
+                FileName = Guid.NewGuid().ToString(),
+                UploadDate = DateTime.Now,
+                Camera = Cameras.Canon,
+                Status = Status.Hidden,
+                Comments = new HashSet<CommentEntity>(),
+                PublishTags = new HashSet<PublishTagEntity>(),
+                UserLikes = new HashSet<UserEntity>(),
+                User = user,
+                Album = userPublicAlbum
+            };
             PublishEntity adminPublicPublish = new PublishEntity()
             {
                 Id = Guid.NewGuid(),
@@ -221,6 +236,21 @@ namespace IntegrationTest
                 UserLikes = new HashSet<UserEntity>(),
                 User = admin,
                 Album = adminPrivateAlbum
+            };
+            PublishEntity adminPrivatePublish2 = new PublishEntity()
+            {
+                Id = Guid.NewGuid(),
+                ImageName = "adminPrivatePublish2",
+                Description = "adminPublicPublishDescription",
+                FileName = Guid.NewGuid().ToString(),
+                UploadDate = DateTime.Now,
+                Camera = Cameras.Canon,
+                Status = Status.Hidden,
+                Comments = new HashSet<CommentEntity>(),
+                PublishTags = new HashSet<PublishTagEntity>() { tag2 },
+                UserLikes = new HashSet<UserEntity>(),
+                User = admin,
+                Album = adminPublicAlbum
             };
             PublishEntity userPublicPublishNoAlbum = new PublishEntity()
             {
@@ -283,8 +313,10 @@ namespace IntegrationTest
             {
                 userPublicPublish = _context.Publishes.Add(userPublicPublish).Entity;
                 userPrivatePublish = _context.Publishes.Add(userPrivatePublish).Entity;
+                userPrivatePublish2 = _context.Publishes.Add(userPrivatePublish2).Entity;
                 adminPublicPublish = _context.Publishes.Add(adminPublicPublish).Entity;
                 adminPrivatePublish = _context.Publishes.Add(adminPrivatePublish).Entity;
+                adminPrivatePublish2 = _context.Publishes.Add(adminPrivatePublish2).Entity;
                 userPublicPublishNoAlbum = _context.Publishes.Add(userPublicPublishNoAlbum).Entity;
                 userPrivatePublishNoAlbum = _context.Publishes.Add(userPrivatePublishNoAlbum).Entity;
                 adminPublicPublishNoAlbum = _context.Publishes.Add(adminPublicPublishNoAlbum).Entity;
@@ -354,7 +386,7 @@ namespace IntegrationTest
         [InlineData("",1,10,5)]
         [InlineData("Admin",1,10,3)]
         [InlineData("User",1,10,2)]
-        public async void GetAllAlbumsAsAdminTest(string? user,int page,int take,int expectedCount)
+        public async void GetManyAlbumsAsAdminTest(string? user,int page,int take,int expectedCount)
         {
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
@@ -378,7 +410,7 @@ namespace IntegrationTest
         [InlineData("", 1, 10, 3)]
         [InlineData("Admin", 1, 10, 1)]
         [InlineData("User", 1, 10, 2)]
-        public async void GetAllAlbumsAsUserTest(string? user, int page, int take, int expectedCount)
+        public async void GetManyAlbumsAsUserTest(string? user, int page, int take, int expectedCount)
         {
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
@@ -400,9 +432,9 @@ namespace IntegrationTest
         [Theory]
         [InlineData("Admin", "adminPublicAlbum", true)]
         [InlineData("Admin", "adminPrivateAlbum", true)]
-        [InlineData("User", "adminPublicAlbum", true)]
-        [InlineData("User", "adminPrivateAlbum", true)]
-        public async void GetOneAsAdmin(string userName,string albumName,bool acces)
+        [InlineData("User", "userPublicAlbum", true)]
+        [InlineData("User", "userPrivateAlbum", true)]
+        public async void GetOneAlbumAsAdmin(string userName,string albumName,bool acces)
         {
             string token = await GetToken(_adminLoginData);          
             HttpRequestMessage request = new HttpRequestMessage()
@@ -429,9 +461,9 @@ namespace IntegrationTest
         [Theory]
         [InlineData("Admin", "adminPublicAlbum", true)]
         [InlineData("Admin", "adminPrivateAlbum", false)]
-        [InlineData("User", "adminPublicAlbum", true)]
-        [InlineData("User", "adminPrivateAlbum", true)]
-        public async void GetOneAsUserTest(string userName, string albumName, bool acces)
+        [InlineData("User", "userPublicAlbum", true)]
+        [InlineData("User", "userPrivateAlbum", true)]
+        public async void GetOneAlbumAsUserTest(string userName, string albumName, bool acces)
         {
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
@@ -456,7 +488,7 @@ namespace IntegrationTest
             }
         }
         [Fact]
-        public async void CreateTest()
+        public async void CreateAlbumTest()
         {
             string token = await GetToken(_adminLoginData);
             PublishAlbumInputDto input = new PublishAlbumInputDto()
@@ -490,7 +522,7 @@ namespace IntegrationTest
             await _client.SendAsync(request2);
         }
         [Fact]
-        public async void UpdateTest()
+        public async void UpdateAlbumTest()
         {
             string token = await GetToken(_adminLoginData);
             PublishAlbumInputDto input = new PublishAlbumInputDto()
@@ -512,9 +544,8 @@ namespace IntegrationTest
             var response = await _client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
-
         [Fact]
-        public async void DeleteTest()
+        public async void DeleteAlbumTest()
         {
             string token = await GetToken(_adminLoginData);
             PublishAlbumInputDto input = new PublishAlbumInputDto()
@@ -547,6 +578,334 @@ namespace IntegrationTest
             var response = await _client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
+
+        [Theory]
+        [InlineData(null,null, 10)]
+        [InlineData("Admin", "adminPublicAlbum", 2)]
+        [InlineData("User", null, 2)]
+        public async void GetManyPublishesAsAdminTest(string? user,string? albumName, int expectedCount)
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Publish/GetMany?userLogin={user}&albumName={albumName}"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<PublishOutputDto>>(json);
+
+
+            Assert.NotNull(list);
+            Assert.Equal(expectedCount, list.Count);
+        }
+        [Theory]
+        [InlineData(null, null, 7)]
+        [InlineData("Admin",null, 1)]
+        [InlineData("User", "userPublicAlbum", 2)]
+        public async void GetManyPublishesAsUserTest(string? user, string? albumName, int expectedCount)
+        {
+            string token = await GetToken(_userLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Publish/GetMany?userLogin={user}&albumName={albumName}"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<PublishOutputDto>>(json);
+
+            Assert.NotNull(list);
+            Assert.Equal(expectedCount, list.Count);
+        }
+        [Theory]
+        [InlineData("Admin", "adminPublicAlbum", "adminPublicPublish", true)]
+        [InlineData("Admin", "adminPrivateAlbum", "adminPrivatePublish", true)]
+        [InlineData("User", "userPublicAlbum", "userPublicPublish", true)]
+        [InlineData("User", "userPrivateAlbum", "userPrivatePublish", true)]
+        public async void GetOnePublishAsAdmin(string userName, string? albumName,string imageName, bool acces)
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Publish/GetOne/{userName}/{imageName}?albumName={albumName}"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            if (acces)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var publish = JsonConvert.DeserializeObject<PublishOutputDto>(json);
+                Assert.NotNull(publish);
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            }
+        }
+        [Theory]
+        [InlineData("Admin", "adminPublicAlbum", "adminPublicPublish", true)]
+        [InlineData("Admin", "adminPrivateAlbum", "adminPrivatePublish", false)]
+        [InlineData("User", "userPublicAlbum", "userPublicPublish", true)]
+        [InlineData("User", "userPrivateAlbum", "userPrivatePublish", true)]
+        public async void GetOnePublishAsUser(string userName, string? albumName, string imageName, bool acces)
+        {
+            string token = await GetToken(_userLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Publish/GetOne/{userName}/{imageName}?albumName={albumName}"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            if (acces)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var publish = JsonConvert.DeserializeObject<PublishOutputDto>(json);
+                Assert.NotNull(publish);
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async void GetManyTagsTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/GetMany"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<PublishTagOutputDto>>(json);
+
+
+            Assert.NotNull(list);
+            Assert.Equal(3, list.Count);
+        }
+        [Fact]
+        public async void GetOneTag()
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/GetOne?tagName=Food"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var tag = JsonConvert.DeserializeObject<PublishTagOutputDto>(json);
+
+
+            Assert.NotNull(tag);
+            Assert.Equal(tag.Name,"Food");
+        }
+        [Fact]
+        public async void CreateTagTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            PublishTagInputDto input = new PublishTagInputDto()
+            {
+                TagName = "CreateTest",
+            };
+            var json = JsonConvert.SerializeObject(input);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/Create"),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                },
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+
+            };
+            var response = await _client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            HttpRequestMessage request2 = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/Delete/CreateTest"),
+                Method = HttpMethod.Delete,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            await _client.SendAsync(request2);
+        }
+        [Fact]
+        public async void UpdateTagTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            PublishTagInputDto input = new PublishTagInputDto()
+            {
+                TagName = "Dog",
+            };
+            var json = JsonConvert.SerializeObject(input);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/Update/Animal"),
+                Method = HttpMethod.Patch,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                },
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+            };
+            var response = await _client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+        [Fact]
+        public async void DeleteTagTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            PublishTagInputDto input = new PublishTagInputDto()
+            {
+                TagName = "DeleteTest",
+            };
+            var json = JsonConvert.SerializeObject(input);
+            HttpRequestMessage request2 = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/Create"),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                },
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+
+            };
+            await _client.SendAsync(request2);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Tag/Delete/DeleteTest"),
+                Method = HttpMethod.Delete,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+        [Fact]
+        public async void GetManyCommentsTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Comment/GetMany"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<CommentOutputDto>>(json);
+
+
+            Assert.NotNull(list);
+        }
+        [Fact]
+        public async void GetManyCommentsForUserTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Comment/GetManyForUser?userLogin=User"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<CommentOutputDto>>(json);
+
+
+            Assert.NotNull(list);
+            Assert.Equal(2, list.Count);
+        }
+        [Fact]
+        public async void GetManyCommentsForPublishTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Comment/GetManyForPublish?userLogin=User&imageName=userPublicPublish"),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                }
+            };
+            var response = await _client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var list = JsonConvert.DeserializeObject<List<CommentOutputDto>>(json);
+
+
+            Assert.NotNull(list);
+            Assert.Equal(1, list.Count);
+            Assert.Equal("XDD", list[0].CommentContent);
+        }
+        [Fact]
+        public async void CreateCommentTest()
+        {
+            string token = await GetToken(_adminLoginData);
+            CommentInputDto input = new CommentInputDto()
+            {
+                AlbumName = "userPublicAlbum",
+                CommentContent = "Test",
+                PublishName = "userPublicPublish",
+                UserName = "User"
+            };
+            var json = JsonConvert.SerializeObject(input);
+            HttpRequestMessage request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(@$"{uri}Comment/Create"),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
+                },
+                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+
+            };
+            var response = await _client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
+
         private async Task<string> GetToken(UserLogin loginData)
         {
             var json = JsonConvert.SerializeObject(loginData);

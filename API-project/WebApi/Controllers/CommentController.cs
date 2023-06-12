@@ -29,7 +29,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] CommentInputDto inputDto)
+        public async Task<IActionResult> Create([FromBody] CommentInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -53,7 +53,7 @@ namespace WebApi.Controllers
         }
         [HttpPatch]
         [Route("Update")]
-        public async Task<IActionResult> Update([FromForm] CommentUpdateInputDto inputDto)
+        public async Task<IActionResult> Update([FromBody] CommentUpdateInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -97,8 +97,8 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetManyForUser/{userLogin}")]
-        public async Task<IActionResult> GetAllForUser([FromRoute] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("GetManyForUser")]
+        public async Task<IActionResult> GetAllForUser([FromQuery] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -121,8 +121,8 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetManyForPublish/{userLogin}/{imageName}")]
-        public async Task<IActionResult> GetAllForPublish([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("GetManyForPublish")]
+        public async Task<IActionResult> GetAllForPublish([FromQuery] string userLogin, [FromQuery] string imageName, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");

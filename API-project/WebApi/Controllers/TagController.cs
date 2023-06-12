@@ -68,7 +68,7 @@ namespace WebApi.Controllers
             {
                 var updated = await _tagService.Update(Guid.Parse(user.Id), tagName, tag);
                 var output = DtoMapper.Map(updated);
-                return Created(output.Name, output);
+                return Ok(output);
             }
             catch (AccessViolationException)
             {
@@ -96,8 +96,8 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetOne/{tagName}")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromRoute] string tagName)
+        [Route("GetOne")]
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromQuery] string tagName)
         {
             var user = await GetCurrentUser();
             if (user is null)
@@ -124,7 +124,7 @@ namespace WebApi.Controllers
             return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),targetId ,tagName,(int)page,(int)take)));
         }*/
         [HttpDelete]
-        [Route("DeleteTag/{tagName}")]
+        [Route("Delete/{tagName}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTag([FromRoute] string tagName)
         {
@@ -136,7 +136,7 @@ namespace WebApi.Controllers
             {
                 var updated = await _tagService.Delete(Guid.Parse(user.Id), tagName);
                 var output = DtoMapper.Map(updated);
-                return Created(output.Name, output);
+                return NoContent();
             }
             catch (AccessViolationException)
             {

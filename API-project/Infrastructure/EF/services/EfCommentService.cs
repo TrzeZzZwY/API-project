@@ -55,7 +55,7 @@ namespace Infrastructure.EF.Services
 
         public Task<IEnumerable<Comment>> GetAll(Guid userId, int page, int take)
         {
-            var query = _context.Comments;
+            var query = _context.Comments.Include(e => e.User);
             var acces = query.Where(e =>
               (e.Publish.Status == Status.Visible) ||
               (e.Publish.User.Id == userId.ToString()) ||

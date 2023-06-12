@@ -123,7 +123,11 @@ namespace WebApi.Controllers
                 var publish = await _publishService.GetOne(Guid.Parse(user.Id), Guid.Parse(target.Id), imageName, albumName);
                 return Ok(DtoMapper.Map(publish));
             }
-            catch (AccessViolationException e)
+            catch (AccessViolationException)
+            {
+                return Forbid();
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
