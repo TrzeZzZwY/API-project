@@ -1,6 +1,6 @@
 # Aplikacja do gromadzenia i udostępniania zdjęć działająca w API
 
-## Zamysłem aplikacji jest, aby użytkownik mógł tworzyć nowe albumy i przesyłał na nie zdjęcia. Aplikacja działa tylko w API i nie posiada interfejsu graficznego oraz została napisana w architekturze Clean Architecture w ASP.NET.
+Zamysłem aplikacji jest, aby użytkownik mógł tworzyć nowe albumy i przesyłał na nie zdjęcia. Aplikacja działa tylko w API i nie posiada interfejsu graficznego oraz została napisana w architekturze [Clean Architecture]([http://example.com](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures)). w ASP.NET.
 
 ## Projekt obejmuje następujące wymagania:
 - Dodanie zdjęcia z opisem (tag, autor, szczegóły, aparat, status: publiczny, prywatne, ograniczony dostęp, inne)
@@ -18,7 +18,9 @@
 
 ## Baza danych
 
+W celu dokonania migracji należy w pierwszej kolejności 
 
+Schemat bazy danych:
 
 ## Po włączeniu aplikacji ukazuje się Swagger z funkcjonalnością aplikacji:
 ![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d8d4dcac-10ce-496d-9568-9a12754b2861)
@@ -93,3 +95,10 @@ Wyświetlenie wszystkich tagów
 Wyświetlenie jednego taga
 
 Usunięcie taga
+
+## Testy jednostkowe
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d82e7581-4e3f-48dc-9515-bfb1885d5310)
+
+## Testy integracyjne
+
