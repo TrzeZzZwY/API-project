@@ -70,7 +70,9 @@ Stworzenie nowego albumu
 
 Edycja istniejącego albumu
 
-![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/ffed14e1-9d95-47f1-a716-85f52794e697)
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/04bb08f0-c1cf-4e54-b341-653111b2e26e)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/0d70a997-e460-4b71-ab7e-28cb8d32b736)
 
 Wyświetlenie wszystkich albumów danego użytkownika
 
@@ -89,42 +91,55 @@ Usuwanie albumu (wraz z zawartością)
 
 ![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/eec0d397-1e55-46ef-914e-e5a61701918a)
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/cec5f233-da5f-4e28-8f7d-dbb5a6bb46d1)
+
 ## Zdjęcia / Posty (Publish)
+
 Przesyłanie nowego zdjęcia
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/3ea35d53-0801-4aea-b789-86e49109b275)
 
 Edycja danego zdjęcia
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/0c4d6684-6f8e-43c1-a860-c7d6ab7e55ae)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/5b05c592-005e-40f4-8440-3405aeb05045)
+
 Wyświetlenie wszystkich zdjęć danego użytkownika
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/1a8742d2-a2b5-4203-9124-e51040977198)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/07523fc8-02bd-40ec-a1e7-6e28eacd273f)
 
 Wyświetlenie jednego, konkretnego zdjęcia danego użytkownika
 
-Zmiana miejsca przechowywania zdjęcia z jednego albumu do drugiego
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/22622c56-52cc-4292-85a9-37b758ccf726)
 
-Uusnięcie konkretnego zdjęcia
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/cdca16e3-2811-4c7e-b1b7-4853dde24688)
 
-Usunięcie wszystkich zdjęć danego użytkownika
+Oprócz tego aplikacja oferuje funkcje zmiany miejsca przechowywania zdjęcia z jednego albumu do drugiego, usnięcia konkretnego zdjęcia oraz usunięcia wszystkich zdjęć danego użytkownika.
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/cf2acab9-dd71-48e0-839a-e5b03539174c)
 
 ## Polubienia 
 
-Dodanie polubienia pod zdjęciem
+Dodanie oraz usunięcie polubienia pod zdjęciem
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/745d60c8-6797-46e8-8469-820e34239876)
 
-Usunięcie polubienia pod zdjęciem
+Liczbę polubień można zauważyć przy wyświetlaniu danych o zdjęciu:
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/b52d6603-a257-4bd3-9567-d3730d97428d)
 
 ## Komentarze
 
-Dodawanie komentarza pod zdjęciem
+- Dodawanie komentarza pod zdjęciem
+- Edycja komentarza
+- Wyświetlenie wszystkich komentarzy
+- Wyświetlenie wszystkich komentarzy dla danego użytkownika
+- Wyświetlenie wszystkich komentarzy dla danego zdjęcia
+- Wyświetlenie danego komentarza po jego ID
+- Usunięcie komentarza
 
-Edycja komentarza
-
-Wyświetlenie wszystkich komentarzy
-
-Wyświetlenie wszystkich komentarzy dla danego użytkownika
-
-Wyświetlenie wszystkich komentarzy dla danego zdjęcia
-
-Wyświetlenie danego komentarza po jego ID
-
-Usunięcie komentarza
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/9170ec78-f31a-49c2-b658-056232a52712)
 
 ## Tagi
 
