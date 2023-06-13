@@ -21,6 +21,7 @@ namespace AppCore.Models
         
         public Cameras Camera { get; set; } = Cameras.None;
         public string? Description { get; set; }
+        public string? Album { get; set; }
         public DateTime UploadDate { get; set; }
         public Status Status { get; set; } = Status.Hidden;
         public ISet<Guid> UserPublishLikes { get; set; } = new HashSet<Guid>();

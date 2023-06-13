@@ -43,6 +43,7 @@ namespace WebApi.Dto.Mappers
                 UserName = p.UserName,
                 Camera = p.Camera,
                 Description = p.Description,
+                Album = p.Album is null ? null : p.Album,
                 UploadDate = p.UploadDate,
                 Status = p.Status,
                 Likes = p.UserPublishLikes is null ? 0 : (uint)p.UserPublishLikes.Count(),

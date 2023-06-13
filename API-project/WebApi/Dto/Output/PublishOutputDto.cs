@@ -10,6 +10,7 @@ namespace WebApi.Dto.Output
         public string UserName { get; set; }
         public Cameras Camera { get; set; }
         public string? Description { get; set; }
+        public string? Album { get; set; }
         public DateTime UploadDate { get; set; }
         public Status Status { get; set; }
         public uint Likes { get; set; }

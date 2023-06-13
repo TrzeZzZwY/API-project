@@ -127,6 +127,7 @@ namespace Infrastructure.EF.Mappers
                 Description = p.Description,
                 UploadDate = p.UploadDate,
                 Status = p.Status,
+                Album = p.Album is null ? null : p.Album.Name,
                 UserPublishLikes = p.UserLikes is null ? new HashSet<Guid>() : p.UserLikes.Select(e => Guid.Parse(e.Id)).ToHashSet(),
                 PublishTags = p.PublishTags is null ? new HashSet<PublishTag>() : Map(p.PublishTags).ToHashSet(),
                 Comments = p.Comments is null ? new HashSet<Comment>() : Map(p.Comments).ToHashSet()
