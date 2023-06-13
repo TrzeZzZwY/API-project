@@ -143,17 +143,27 @@ Liczbę polubień można zauważyć przy wyświetlaniu danych o zdjęciu:
 
 ## Tagi
 
-Utworzenie taga
+Aplikacja posiada również system tagów, czyli oznaczeń pozwalających na wygodne wyszukiwanie preferowanych zdjęć
+- Utworzenie taga
+- Edycja taga
+- Wyświetlenie wszystkich tagów
+- Wyświetlenie jednego taga
+- Usunięcie taga
 
-Edycja taga
-
-Wyświetlenie wszystkich tagów
-
-Wyświetlenie jednego taga
-
-Usunięcie taga
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/518e79e6-1d0e-4563-83ef-0db9d7dc5b3a)
 
 ## FakeData
+
+Aplikacja umożliwia tworzenie fałszywych danych wygenerowanych losowo. Można wygenerować fałszywych:
+- użytkowników
+- tagi
+- albumy
+- zdjęcia
+- komentarze
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d0e7cfe0-d433-4225-8c05-63d4dc44e385)
+
+Przykładowe wygenerowanie dziesięciu "fake'owych" (losowych) zdjęć:
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/1956a420-f16b-4cb4-93e4-1ee5a4e917c6)
 
 ## Testy jednostkowe
 
