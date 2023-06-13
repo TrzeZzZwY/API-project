@@ -26,7 +26,10 @@ Schemat bazy danych:
 
 ![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/c5001713-9576-4043-9077-c946c2b44815)
 
-## Po włączeniu aplikacji ukazuje się Swagger z funkcjonalnością aplikacji:
+## Swagger
+
+Po włączeniu aplikacji ukazuje się Swagger z funkcjonalnością aplikacji:
+
 ![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d8d4dcac-10ce-496d-9568-9a12754b2861)
 
 ## Użytkownik 
@@ -61,13 +64,30 @@ _W dokumentacji w celu przedstawienia całej funkcjonalności zostało użyte ko
 
 Stworzenie nowego albumu
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/241b2121-62fc-4093-8988-e2192f0b5fb2)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/5fb0f209-c579-4a40-9bd9-f10267f50ad6)
+
 Edycja istniejącego albumu
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/ffed14e1-9d95-47f1-a716-85f52794e697)
 
 Wyświetlenie wszystkich albumów danego użytkownika
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/99c5863b-75dd-40b6-9909-1c52fe9dd0a6)
+_Warto zauważyć, że wyświetlanie danych na stronie posiada funckję stronnicowania. Można wybrać numer strony oraz liczbę wyświetlonych elementów do wyświetlenia._
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/82b1c70f-c693-4b16-aa94-e1405e993e57)
+
 Wyświetlenie konkretnego albumu danego użytkownika
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/97c906cd-c712-4000-a47b-a326c6dd0fe6)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/369386d1-efca-4931-a8e9-7fcadc42ab7c)
+
 Usuwanie albumu (wraz z zawartością)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/eec0d397-1e55-46ef-914e-e5a61701918a)
 
 ## Zdjęcia / Posty (Publish)
 Przesyłanie nowego zdjęcia
