@@ -18,22 +18,44 @@ Zamysłem aplikacji jest, aby użytkownik mógł tworzyć nowe albumy i przesył
 
 ## Baza danych
 
-W celu dokonania migracji należy w pierwszej kolejności 
+W celu wykonania migracji należy w pierwszej kolejności określić nazwę serwera w pliku appsettings.json oraz dokonać migrację poprzez komendę update-database w konsoli.
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/7dade6aa-f20c-4d60-9874-f0f903b12de1)
 
 Schemat bazy danych:
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/c5001713-9576-4043-9077-c946c2b44815)
 
 ## Po włączeniu aplikacji ukazuje się Swagger z funkcjonalnością aplikacji:
 ![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d8d4dcac-10ce-496d-9568-9a12754b2861)
 
 ## Użytkownik 
 
-Dodawanie nowego użytkownika
+Dodawanie nowego użytkownika (Rejestracja)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/f7d4b7ed-aca6-4384-8d77-dacd9b10ab80)
 
 Dodawanie admina
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/7b558237-0ddb-46c5-9fba-526a8963990f)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/e9bc2307-04d4-45f0-b4c0-524e3c53b0cd)
+
 Logowanie
 
-Autoryzacja
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d0a1393b-69dc-416c-8a77-a0791184be38)
+
+Po zalogowaniu należy skopiować wygenerowany token
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/8f592e0f-dd0e-4166-92cc-aa7a765c89a3)
+
+A następnie użyć go przy autoryzacji
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/8bed00e3-0ae8-416f-a4ba-803a20342fcb)
+
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/793f120a-ad6a-422f-8038-05faa31e2178)
+
+_W dokumentacji w celu przedstawienia całej funkcjonalności zostało użyte konto administratora_
 
 ## Album
 
@@ -96,9 +118,12 @@ Wyświetlenie jednego taga
 
 Usunięcie taga
 
+## FakeData
+
 ## Testy jednostkowe
 
-![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/d82e7581-4e3f-48dc-9515-bfb1885d5310)
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/eb1a9f1c-8402-4ec7-a213-097cffb7f730)
 
 ## Testy integracyjne
 
+![image](https://github.com/TrzeZzZwY/API-project/assets/117681023/a63ca40f-cc29-4398-b155-44e2f5e753f9)
