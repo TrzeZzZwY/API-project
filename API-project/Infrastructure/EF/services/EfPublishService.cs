@@ -312,7 +312,7 @@ namespace Infrastructure.EF.Services
         public async Task<Publish> Update(Guid publishId, Publish publish)
         {
             var find = await FindPublish(publishId);
-            if (_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == find.Album && e.ImageName == publish.ImageName))
+            if (_context.Publishes.Any(e => e.User.Id == find.User.Id && e.Album == find.Album && e.ImageName == publish.ImageName && e.Id != find.Id))
                 throw new ArgumentException($"name {publish.ImageName} is already takien in that folder");
             find.Status = publish.Status;
             find.ImageName = publish.ImageName;

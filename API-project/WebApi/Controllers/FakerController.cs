@@ -54,7 +54,7 @@ namespace WebApi.Controllers
                 foreach (var user in users)
                 {
                     var saved = await _userManager.CreateAsync(user, "1qazXSW@");
-                    await _userManager.AddToRoleAsync(user, "ADMIN");
+                    await _userManager.AddToRoleAsync(user, "USER");
                 }
                 return Ok();
             }
