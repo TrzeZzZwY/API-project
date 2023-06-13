@@ -40,6 +40,7 @@ namespace WebApi.Utilities
         public static void DeleteImage(UserEntity user, IEnumerable<string> FileNames, IWebHostEnvironment hostEnvironment)
         {
             string dir = Path.Combine(hostEnvironment.ContentRootPath, "Uploads", user.UserName);
+            Directory.CreateDirectory(dir);
             string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
