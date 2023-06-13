@@ -20,12 +20,12 @@ namespace WebApi.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class AlbumController : Controller
+    public class AlbumsController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfAlbumServiceAuthorized _albumService;
         private readonly IWebHostEnvironment _hostEnvironment;
-        public AlbumController(UserManager<UserEntity> userManager, EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
+        public AlbumsController(UserManager<UserEntity> userManager, EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _albumService = albumService;
@@ -33,7 +33,6 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<IActionResult> Create([FromBody] PublishAlbumInputDto inputDto)
         {
             if (!ModelState.IsValid)
@@ -56,7 +55,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpPatch]
-        [Route("Update/{albumName}")]
+        [Route("{albumName}")]
         public async Task<IActionResult> Update([FromBody] PublishAlbumInputDto inputDto, [FromRoute] string albumName)
         {
             if (!ModelState.IsValid)
@@ -99,7 +98,6 @@ namespace WebApi.Controllers
             return Ok(mapped);
         }*/
         [HttpGet]
-        [Route("GetMany")]
         public async Task<ActionResult<IEnumerable<PublishAlbumOutputDto>>> GetAllFor([FromQuery] string? userLogin, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
@@ -128,7 +126,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetOne/{userLogin}/{albumName}")]
+        [Route("{userLogin}/{albumName}")]
         public async Task<ActionResult<PublishAlbumOutputDto>> GetOne([FromRoute] string userLogin, [FromRoute] string albumName)
         {
             var user = await GetCurrentUser();
@@ -151,7 +149,7 @@ namespace WebApi.Controllers
 
         }
         [HttpDelete]
-        [Route("Delete/{albumName}")]
+        [Route("{albumName}")]
         public async Task<ActionResult<PublishAlbumOutputDto>> Delete([FromRoute] string albumName)
         {
             var user = await GetCurrentUser();

@@ -18,18 +18,17 @@ namespace WebApi.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class TagController : Controller
+    public class TagsController : Controller
     {
         private readonly EfTagServiceAuthorized _tagService;
         private readonly UserManager<UserEntity> _userManager;
 
-        public TagController(EfTagServiceAuthorized tagService, UserManager<UserEntity> userManager)
+        public TagsController(EfTagServiceAuthorized tagService, UserManager<UserEntity> userManager)
         {
             _tagService = tagService;
             _userManager = userManager;
         }
         [HttpPost]
-        [Route("Create")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddTag([FromBody]PublishTagInputDto input)
         {
@@ -53,7 +52,7 @@ namespace WebApi.Controllers
             }            
         }
         [HttpPatch]
-        [Route("Update/{tagName}")]
+        [Route("{tagName}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTag([FromRoute]string tagName,[FromBody] PublishTagInputDto input)
         {
@@ -85,7 +84,6 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetMany")]
         public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
@@ -96,8 +94,8 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetOne")]
-        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromQuery] string tagName)
+        [Route("{tagName}")]
+        public async Task<ActionResult<IEnumerable<PublishTagOutputDto>>> GetOne([FromRoute] string tagName)
         {
             var user = await GetCurrentUser();
             if (user is null)
@@ -124,7 +122,7 @@ namespace WebApi.Controllers
             return Ok(DtoMapper.Map(await _tagService.GetAllPublishesForTag(Guid.Parse(user.Id),targetId ,tagName,(int)page,(int)take)));
         }*/
         [HttpDelete]
-        [Route("Delete/{tagName}")]
+        [Route("{tagName}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTag([FromRoute] string tagName)
         {

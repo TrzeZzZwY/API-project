@@ -16,19 +16,18 @@ namespace WebApi.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class CommentController : Controller
+    public class CommentsController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfCommentServiceAuthorized _commentService;
 
-        public CommentController(UserManager<UserEntity> userManager, EfCommentServiceAuthorized commentService)
+        public CommentsController(UserManager<UserEntity> userManager, EfCommentServiceAuthorized commentService)
         {
             _userManager = userManager;
             _commentService = commentService;
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<IActionResult> Create([FromBody] CommentInputDto inputDto)
         {
             if (!ModelState.IsValid)
@@ -52,7 +51,6 @@ namespace WebApi.Controllers
             }
         }
         [HttpPatch]
-        [Route("Update")]
         public async Task<IActionResult> Update([FromBody] CommentUpdateInputDto inputDto)
         {
             if (!ModelState.IsValid)
@@ -75,7 +73,6 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetMany")]
         public async Task<IActionResult> GetAll([FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
@@ -97,8 +94,8 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetManyForUser")]
-        public async Task<IActionResult> GetAllForUser([FromQuery] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("{userLogin}")]
+        public async Task<IActionResult> GetAllForUser([FromRoute] string userLogin,[FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -121,8 +118,8 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetManyForPublish")]
-        public async Task<IActionResult> GetAllForPublish([FromQuery] string userLogin, [FromQuery] string imageName, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
+        [Route("{userLogin}/{imageName}")]
+        public async Task<IActionResult> GetAllForPublish([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Model is not valid");
@@ -145,7 +142,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetOne/{commentId}")]
+        [Route("{commentId}")]
         public async Task<IActionResult> GetOne([FromRoute] Guid commentId)
         {
             if (!ModelState.IsValid)
@@ -167,7 +164,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpDelete]
-        [Route("Delete/{commentId}")]
+        [Route("{commentId}")]
         public async Task<IActionResult> Delete([FromRoute] Guid commentId)
         {
             if (!ModelState.IsValid)

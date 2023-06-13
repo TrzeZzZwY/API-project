@@ -16,12 +16,12 @@ namespace WebApi.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    public class PublishController : Controller
+    public class PublishesController : Controller
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly EfPublishServiceAuthorized _publishService;
         private readonly IWebHostEnvironment _hostEnvironment;
-        public PublishController(UserManager<UserEntity> userManager, EfPublishServiceAuthorized publishService,
+        public PublishesController(UserManager<UserEntity> userManager, EfPublishServiceAuthorized publishService,
             EfAlbumServiceAuthorized albumService, IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
@@ -29,7 +29,6 @@ namespace WebApi.Controllers
             _hostEnvironment = hostEnvironment;
         }
         [HttpPost]
-        [Route("Create")]
         public async Task<ActionResult<PublishOutputDto>> Create([FromForm] PublishInputDto input)
         {
             if (!ModelState.IsValid)
@@ -59,7 +58,7 @@ namespace WebApi.Controllers
 
         }
         [HttpPatch]
-        [Route("Update/{userLogin}/{imageName}")]
+        [Route("{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> Update([FromBody] PublishUpdateInputDto input, [FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             if (!ModelState.IsValid)
@@ -82,7 +81,6 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetMany")]
         public async Task<ActionResult<IEnumerable<PublishOutputDto>>> GetAllPublishes([FromQuery] string? userLogin, [FromQuery] string[]? tagNames, [FromQuery] string? albumName, [FromQuery] int? page = 1, [FromQuery] int? take = 10)
         {
             var user = await GetCurrentUser();
@@ -110,7 +108,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetOne/{userLogin}/{imageName}")]
+        [Route("{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> GetImageDetails([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
@@ -133,9 +131,12 @@ namespace WebApi.Controllers
             }
         }
         [HttpGet]
-        [Route("GetOneImage/{userLogin}/{imageName}")]
-        public async Task<ActionResult<PublishOutputDto>> GetImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
+        [Route("Image/{userLogin}/{imageName}")]
+        public async Task<ActionResult<PublishOutputDto>> GetImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName, [FromQuery] bool mini = false)
         {
+            if (mini == true)
+                return await GetMiniImage(userLogin, imageName, albumName);
+
             var user = await GetCurrentUser();
             var target = await GetTargetUser(userLogin);
             if (user is null || target is null)
@@ -157,9 +158,9 @@ namespace WebApi.Controllers
             }
 
         }
-        [HttpGet]
-        [Route("GetOneMiniImage/{userLogin}/{imageName}")]
-        public async Task<ActionResult<PublishOutputDto>> GetMiniImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
+        //[HttpGet]
+        //[Route("GetOneMiniImage/{userLogin}/{imageName}")]
+        private async Task<ActionResult<PublishOutputDto>> GetMiniImage([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
             var target = await GetTargetUser(userLogin);
@@ -217,7 +218,7 @@ namespace WebApi.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet]
+        [HttpPatch]
         [Route("MoveTo/{userLogin}/{imageName}")]
         public async Task<ActionResult<bool>> Move([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? oldAlbumName, [FromQuery] string? newAlbumName)
         {
@@ -236,7 +237,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpDelete]
-        [Route("Delete/{userLogin}/{imageName}")]
+        [Route("{userLogin}/{imageName}")]
         public async Task<ActionResult<PublishOutputDto>> Delete([FromRoute] string userLogin, [FromRoute] string imageName, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();
@@ -257,7 +258,7 @@ namespace WebApi.Controllers
             }
         }
         [HttpDelete]
-        [Route("DeleteAll/{userLogin}")]
+        [Route("{userLogin}")]
         public async Task<ActionResult<IEnumerable<PublishOutputDto>>> Delete([FromRoute] string userLogin, [FromQuery] string? albumName)
         {
             var user = await GetCurrentUser();

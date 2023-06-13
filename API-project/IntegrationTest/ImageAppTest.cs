@@ -391,7 +391,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/GetMany?userLogin={user}&page={page}&take={take}"),
+                RequestUri = new Uri(@$"{uri}Albums?userLogin={user}&page={page}&take={take}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -415,7 +415,7 @@ namespace IntegrationTest
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/GetMany?userLogin={user}&page={page}&take={take}"),
+                RequestUri = new Uri(@$"{uri}Albums?userLogin={user}&page={page}&take={take}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -439,7 +439,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);          
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/GetOne/{userName}/{albumName}"),
+                RequestUri = new Uri(@$"{uri}Albums/{userName}/{albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -468,7 +468,7 @@ namespace IntegrationTest
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/GetOne/{userName}/{albumName}"),
+                RequestUri = new Uri(@$"{uri}Albums/{userName}/{albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -499,7 +499,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/Create"),
+                RequestUri = new Uri(@$"{uri}Albums"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
@@ -512,7 +512,7 @@ namespace IntegrationTest
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             HttpRequestMessage request2 = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/Delete/CreateTest"),
+                RequestUri = new Uri(@$"{uri}Albums/CreateTest"),
                 Method = HttpMethod.Delete,
                 Headers =
                 {
@@ -533,7 +533,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/Update/adminUpdate"),
+                RequestUri = new Uri(@$"{uri}Albums/adminUpdate"),
                 Method = HttpMethod.Patch,
                 Headers =
                 {
@@ -556,7 +556,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request2 = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/Create"),
+                RequestUri = new Uri(@$"{uri}Albums"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
@@ -568,7 +568,7 @@ namespace IntegrationTest
             await _client.SendAsync(request2);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Album/Delete/DeleteTest"),
+                RequestUri = new Uri(@$"{uri}Albums/DeleteTest"),
                 Method = HttpMethod.Delete,
                 Headers =
                 {
@@ -588,7 +588,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Publish/GetMany?userLogin={user}&albumName={albumName}"),
+                RequestUri = new Uri(@$"{uri}Publishes/?userLogin={user}&albumName={albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -612,7 +612,7 @@ namespace IntegrationTest
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Publish/GetMany?userLogin={user}&albumName={albumName}"),
+                RequestUri = new Uri(@$"{uri}Publishes/?userLogin={user}&albumName={albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -636,7 +636,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Publish/GetOne/{userName}/{imageName}?albumName={albumName}"),
+                RequestUri = new Uri(@$"{uri}Publishes/{userName}/{imageName}?albumName={albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -665,7 +665,7 @@ namespace IntegrationTest
             string token = await GetToken(_userLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Publish/GetOne/{userName}/{imageName}?albumName={albumName}"),
+                RequestUri = new Uri(@$"{uri}Publishes/{userName}/{imageName}?albumName={albumName}"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -691,7 +691,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/GetMany"),
+                RequestUri = new Uri(@$"{uri}Tags"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -712,7 +712,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/GetOne?tagName=Food"),
+                RequestUri = new Uri(@$"{uri}Tags/Food"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -738,7 +738,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/Create"),
+                RequestUri = new Uri(@$"{uri}Tags"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
@@ -751,7 +751,7 @@ namespace IntegrationTest
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             HttpRequestMessage request2 = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/Delete/CreateTest"),
+                RequestUri = new Uri(@$"{uri}Tags/CreateTest"),
                 Method = HttpMethod.Delete,
                 Headers =
                 {
@@ -771,7 +771,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/Update/Animal"),
+                RequestUri = new Uri(@$"{uri}Tags/Animal"),
                 Method = HttpMethod.Patch,
                 Headers =
                 {
@@ -793,7 +793,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request2 = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/Create"),
+                RequestUri = new Uri(@$"{uri}Tags"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
@@ -805,7 +805,7 @@ namespace IntegrationTest
             await _client.SendAsync(request2);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Tag/Delete/DeleteTest"),
+                RequestUri = new Uri(@$"{uri}Tags/DeleteTest"),
                 Method = HttpMethod.Delete,
                 Headers =
                 {
@@ -821,7 +821,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Comment/GetMany"),
+                RequestUri = new Uri(@$"{uri}Comments"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -834,27 +834,6 @@ namespace IntegrationTest
 
 
             Assert.NotNull(list);
-        }
-        [Fact]
-        public async void GetManyCommentsForUserTest()
-        {
-            string token = await GetToken(_adminLoginData);
-            HttpRequestMessage request = new HttpRequestMessage()
-            {
-                RequestUri = new Uri(@$"{uri}Comment/GetManyForUser?userLogin=User"),
-                Method = HttpMethod.Get,
-                Headers =
-                {
-                    {HttpRequestHeader.Authorization.ToString(), $"Bearer {token}"}
-                }
-            };
-            var response = await _client.SendAsync(request);
-            var json = await response.Content.ReadAsStringAsync();
-            var list = JsonConvert.DeserializeObject<List<CommentOutputDto>>(json);
-
-
-            Assert.NotNull(list);
-            Assert.Equal(2, list.Count);
         }
         [Fact]
         public async void GetManyCommentsForPublishTest()
@@ -862,7 +841,7 @@ namespace IntegrationTest
             string token = await GetToken(_adminLoginData);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Comment/GetManyForPublish?userLogin=User&imageName=userPublicPublish"),
+                RequestUri = new Uri(@$"{uri}Comments/User/userPublicPublish"),
                 Method = HttpMethod.Get,
                 Headers =
                 {
@@ -892,7 +871,7 @@ namespace IntegrationTest
             var json = JsonConvert.SerializeObject(input);
             HttpRequestMessage request = new HttpRequestMessage()
             {
-                RequestUri = new Uri(@$"{uri}Comment/Create"),
+                RequestUri = new Uri(@$"{uri}Comments"),
                 Method = HttpMethod.Post,
                 Headers =
                 {
